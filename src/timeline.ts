@@ -7,27 +7,27 @@ export type Beat = {
   say: string; subtitle: string; keyword: string;
 };
 
-export const TOTAL_FRAMES = 5603;
+export const TOTAL_FRAMES = 5237;
 export const FPS = 30;
 
 export const CHAPTERS: {n: number; title: string; from: number; to: number}[] = [
-  {n: 1, title: 'Part 1', from: 106, to: 2082},
-  {n: 2, title: 'Part 2', from: 2083, to: 3836},
-  {n: 3, title: 'Part 3', from: 3837, to: 5493},
+  {n: 1, title: 'Part 1', from: 106, to: 1935},
+  {n: 2, title: 'Part 2', from: 1936, to: 3511},
+  {n: 3, title: 'Part 3', from: 3512, to: 5127},
 ];
 
 export const BEATS: Beat[] = [
-  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 432, say: 'देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, aur ye topic usse kaise solve karta hai.', subtitle: 'The problem', keyword: 'Problem'},
-  {id: 's2', chapter: 1, type: 'concept', from: 445, to: 943, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
-  {id: 's3', chapter: 1, type: 'steps', from: 956, to: 1302, say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।', subtitle: 'Step by step', keyword: 'How it works'},
-  {id: 's4', chapter: 1, type: 'number', from: 1315, to: 1628, say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।', subtitle: 'One number', keyword: 'By the numbers'},
-  {id: 's5', chapter: 1, type: 'compare', from: 1641, to: 2056, say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।', subtitle: 'The difference', keyword: 'Compare'},
-  {id: 's6', chapter: 2, type: 'concept', from: 2083, to: 2581, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
-  {id: 's7', chapter: 2, type: 'steps', from: 2594, to: 2940, say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।', subtitle: 'Step by step', keyword: 'How it works'},
-  {id: 's8', chapter: 2, type: 'concept', from: 2953, to: 3451, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
-  {id: 's9', chapter: 2, type: 'steps', from: 3464, to: 3810, say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।', subtitle: 'Step by step', keyword: 'How it works'},
-  {id: 's10', chapter: 3, type: 'number', from: 3837, to: 4150, say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।', subtitle: 'One number', keyword: 'By the numbers'},
-  {id: 's11', chapter: 3, type: 'compare', from: 4163, to: 4578, say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।', subtitle: 'The difference', keyword: 'Compare'},
-  {id: 's12', chapter: 3, type: 'concept', from: 4591, to: 5089, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
-  {id: 's13', chapter: 3, type: 'recap', from: 5102, to: 5467, say: 'Bas itna yaad rakho. Teen baatein, aur kaam khatam. तीन बातें एक-एक line में दोहराओ। और एक छोटा homework दे दो viewer को।', subtitle: 'Quick recap', keyword: 'Remember'},
+  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 488, say: 'देखो भाई, यहाँ एक आम situation है। ज़्यादातर लोग इस problem से रोज़ गुज़रते हैं, और उन्हें पता भी नहीं होता कि इसका solution इतना आसान है।', subtitle: 'The problem', keyword: 'Problem'},
+  {id: 's2', chapter: 1, type: 'concept', from: 501, to: 961, say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।', subtitle: 'RAG Explained', keyword: 'RAG Explained'},
+  {id: 's3', chapter: 1, type: 'steps', from: 974, to: 1269, say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।', subtitle: 'Step by step', keyword: 'How it works'},
+  {id: 's4', chapter: 1, type: 'number', from: 1282, to: 1585, say: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।', subtitle: 'One number', keyword: 'By the numbers'},
+  {id: 's5', chapter: 1, type: 'compare', from: 1598, to: 1909, say: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।', subtitle: 'The difference', keyword: 'Compare'},
+  {id: 's6', chapter: 2, type: 'concept', from: 1936, to: 2396, say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।', subtitle: 'RAG Explained', keyword: 'RAG Explained'},
+  {id: 's7', chapter: 2, type: 'steps', from: 2409, to: 2704, say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।', subtitle: 'Step by step', keyword: 'How it works'},
+  {id: 's8', chapter: 2, type: 'concept', from: 2717, to: 3177, say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।', subtitle: 'RAG Explained', keyword: 'RAG Explained'},
+  {id: 's9', chapter: 2, type: 'steps', from: 3190, to: 3485, say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।', subtitle: 'Step by step', keyword: 'How it works'},
+  {id: 's10', chapter: 3, type: 'number', from: 3512, to: 3815, say: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।', subtitle: 'One number', keyword: 'By the numbers'},
+  {id: 's11', chapter: 3, type: 'compare', from: 3828, to: 4139, say: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।', subtitle: 'The difference', keyword: 'Compare'},
+  {id: 's12', chapter: 3, type: 'concept', from: 4152, to: 4612, say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।', subtitle: 'RAG Explained', keyword: 'RAG Explained'},
+  {id: 's13', chapter: 3, type: 'recap', from: 4625, to: 5101, say: 'बस इतना याद रखो। समस्या क्या थी, हल कैसे निकला, और आगे क्या करना है। तीन बातें, और काम ख़त्म। तीन बातें एक-एक line में दोहरा लो, तो सब पक्का हो जाता है।', subtitle: 'Quick recap', keyword: 'Remember'},
 ];

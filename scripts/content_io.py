@@ -17,6 +17,21 @@ CONTENT = os.path.join(ROOT, 'src', 'content.ts')
 
 TYPES = ['hook', 'concept', 'steps', 'compare', 'number', 'recap']
 
+# Render layouts — src/components/Scenes.tsx me har naam ka ek component hai.
+# `type` = content ka matlab (check_content isse dekhta hai),
+# `layout` = screen par kaise dikhe. Default: type ke hisaab se.
+LAYOUTS = {
+    'hook': ['hook', 'quote', 'bigword'],
+    'concept': ['concept', 'bullets', 'cards', 'two-col'],
+    'steps': ['steps', 'timeline', 'numbered'],
+    'compare': ['compare', 'versus', 'table'],
+    'number': ['number', 'stat'],
+    'recap': ['recap', 'checklist', 'takeaways'],
+}
+DEFAULT_LAYOUT = {'hook': 'hook', 'concept': 'concept', 'steps': 'steps',
+                  'compare': 'compare', 'number': 'number', 'recap': 'recap'}
+ALL_LAYOUTS = sorted({l for v in LAYOUTS.values() for l in v})
+
 # pacing — build_voice.py se match
 WORDS_PER_SEC = 2.6
 LEAD_S = 3.5
@@ -101,6 +116,7 @@ def load(path=CONTENT):
                 'value': g('value'),
                 'unit': g('unit'),
                 'caption': g('caption'),
+                'layout': g('layout') or DEFAULT_LAYOUT.get(sm.group(2), 'concept'),
             })
         data['chapters'].append({'title': _unesc(cm.group(1)), 'scenes': scenes})
     return data
@@ -180,6 +196,9 @@ def save(data, path=CONTENT):
             lines.append(f"          subtitle: '{_esc(sc.get('subtitle', ''))}',")
             if sc.get('keyword'):
                 lines.append(f"          keyword: '{_esc(sc['keyword'])}',")
+            lay = sc.get('layout')
+            if lay and lay != DEFAULT_LAYOUT.get(sc.get('type'), 'concept'):
+                lines.append(f"      layout: '{_esc(lay)}',")
             if sc.get('bullets'):
                 bl = ', '.join(f"'{_esc(b)}'" for b in sc['bullets'])
                 lines.append(f'          bullets: [{bl}],')
@@ -305,6 +324,7 @@ def skeleton(topic, minutes, title=None, tagline=None):
                 'keyword': {'hook': 'Problem', 'concept': title, 'steps': 'How it works',
                             'number': 'By the numbers', 'compare': 'Compare',
                             'recap': 'Remember'}[t],
+                'layout': DEFAULT_LAYOUT.get(t, 'concept'),
                 'bullets': [], 'steps': [], 'left': None, 'right': None,
                 'value': '', 'unit': '', 'caption': '',
             }

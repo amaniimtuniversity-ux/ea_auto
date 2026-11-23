@@ -8,12 +8,24 @@ import {Subtitles} from './components/Subtitle';
 import {CutFlash, Grid, ProgressBar, Signature} from './components/Chrome';
 import {EndCard, TitleCard} from './components/Cards';
 import {
+  BigWordScene,
+  BulletsScene,
+  CardsScene,
+  ChecklistScene,
   CompareScene,
   ConceptScene,
   HookScene,
+  NumberedScene,
   NumberScene,
+  QuoteScene,
   RecapScene,
+  StatScene,
   StepsScene,
+  TableScene,
+  TakeawaysScene,
+  TimelineScene,
+  TwoColScene,
+  VersusScene,
 } from './components/Scenes';
 
 /**
@@ -35,9 +47,44 @@ const scenePropsFor = (id: string) => {
   return undefined;
 };
 
+/**
+ * `layout` se screen chunte hain, `type` se sirf content ka matlab.
+ * Isliye ek hi type ke do scenes alag dikh sakte hain — pattern repeat nahi hota.
+ */
+const LayoutBody: React.FC<{s: NonNullable<ReturnType<typeof scenePropsFor>>}> = ({s}) => {
+  const p = {keyword: s.keyword, bullets: s.bullets, steps: s.steps,
+             left: s.left, right: s.right, value: s.value, unit: s.unit, caption: s.caption};
+  switch (s.layout) {
+    case 'quote': return <QuoteScene {...p} />;
+    case 'bigword': return <BigWordScene {...p} />;
+    case 'bullets': return <BulletsScene {...p} />;
+    case 'cards': return <CardsScene {...p} />;
+    case 'two-col': return <TwoColScene {...p} />;
+    case 'timeline': return <TimelineScene {...p} />;
+    case 'numbered': return <NumberedScene {...p} />;
+    case 'versus': return <VersusScene {...p} />;
+    case 'table': return <TableScene {...p} />;
+    case 'stat': return <StatScene {...p} />;
+    case 'checklist': return <ChecklistScene {...p} />;
+    case 'takeaways': return <TakeawaysScene {...p} />;
+    default: break;
+  }
+  return null;   // fall through to type-based
+};
+
+const DEFAULT_LAYOUT_FOR: Record<string, string> = {
+  hook: 'hook', concept: 'concept', steps: 'steps',
+  compare: 'compare', number: 'number', recap: 'recap',
+};
+
 const SceneBody: React.FC<{id: string}> = ({id}) => {
   const s = scenePropsFor(id);
   if (!s) return null;
+  // `layout` set hai aur type ke default se alag hai -> wo layout use karo
+  const def = DEFAULT_LAYOUT_FOR[s.type];
+  if (s.layout && s.layout !== def) {
+    return <LayoutBody s={s} />;
+  }
   switch (s.type) {
     case 'hook':
       return <HookScene keyword={s.keyword} bullets={s.bullets} />;

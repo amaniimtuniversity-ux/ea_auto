@@ -1,7 +1,7 @@
 /**
  * ============================================================
  *  kathareel — content file (by raghv)
- *  Topic: Machine Learning
+ *  Topic: RAG Explained
  * ============================================================
  *
  *  `say`      = jo bola jayega -> HINDI, DEVANAGARI me (English tech words Latin me chalenge)
@@ -41,8 +41,8 @@ export type VideoContent = {
 };
 
 export const CONTENT: VideoContent = {
-  slug: 'machine-learning',
-  title: 'Machine Learning',
+  slug: 'rag-explained',
+  title: 'RAG Explained',
   tagline: 'In Hindi, step by step',
   chapters: [
     {
@@ -59,9 +59,9 @@ export const CONTENT: VideoContent = {
         {
           id: 's2',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'Machine Learning',
-          keyword: 'Machine Learning',
+          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'RAG Explained',
+          keyword: 'RAG Explained',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
@@ -99,9 +99,9 @@ export const CONTENT: VideoContent = {
         {
           id: 's6',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'Machine Learning',
-          keyword: 'Machine Learning',
+          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'RAG Explained',
+          keyword: 'RAG Explained',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
@@ -115,9 +115,9 @@ export const CONTENT: VideoContent = {
         {
           id: 's8',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'Machine Learning',
-          keyword: 'Machine Learning',
+          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'RAG Explained',
+          keyword: 'RAG Explained',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
@@ -155,9 +155,9 @@ export const CONTENT: VideoContent = {
         {
           id: 's12',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'Machine Learning',
-          keyword: 'Machine Learning',
+          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'RAG Explained',
+          keyword: 'RAG Explained',
           bullets: ['first point', 'second point', 'third point'],
         },
         {

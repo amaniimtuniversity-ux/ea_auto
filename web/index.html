@@ -297,6 +297,22 @@ async function jfetch(url, opts) {
   return JSON.parse(raw);
 }
 const TYPES = ['hook','concept','steps','compare','number','recap'];
+const LAYOUTS = {
+  hook: ['hook','quote','bigword'],
+  concept: ['concept','bullets','cards','two-col'],
+  steps: ['steps','timeline','numbered'],
+  compare: ['compare','versus','table'],
+  number: ['number','stat'],
+  recap: ['recap','checklist','takeaways']
+};
+const LAYOUT_LABEL = {
+  hook:'Chat card', quote:'Big quote', bigword:'One big word',
+  concept:'Ring + bullets', bullets:'Plain bullets', cards:'Grid cards', 'two-col':'Two columns',
+  steps:'Step list', timeline:'Timeline', numbered:'Numbered cards',
+  compare:'Side by side', versus:'VS split', table:'Table rows',
+  number:'Big number', stat:'Stat + bar',
+  recap:'Recap bullets', checklist:'Checklist', takeaways:'3 takeaways'
+};
 let CONTENT = {slug:'video', title:'', tagline:'', chapters:[]};
 let TARGET_MIN = 3;
 
@@ -399,7 +415,10 @@ function sceneHTML(sc, ci, si) {
   <div class="scene" data-c="${ci}" data-s="${si}">
     <div class="scene-t">
       <span class="chapter chapnum">${sc.id}</span>
-      <select class="scene-type-sel" data-c="${ci}" data-s="${si}" style="width:auto;padding:3px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;background:rgba(59,201,245,.08);color:var(--cool);border-color:var(--edge2)">${typeOpts}</select>
+      <select class="scene-type-sel" data-c="${ci}" data-s="${si}" title="content type" style="width:auto;padding:3px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;background:rgba(59,201,245,.08);color:var(--cool);border-color:var(--edge2)">${typeOpts}</select>
+      <select class="scene-layout-sel" data-c="${ci}" data-s="${si}" title="screen layout" style="width:auto;padding:3px 8px;font-size:11px;background:rgba(255,107,44,.1);color:var(--accent-s);border-color:var(--edge2)">
+        ${(LAYOUTS[sc.type]||['concept']).map(l=>`<option value="${l}" ${(sc.layout||sc.type)===l?'selected':''}>${LAYOUT_LABEL[l]||l}</option>`).join('')}
+      </select>
       <span class="scene-time">~${Math.round(secs)}s</span>
       ${(!(sc.say||'').trim() || !/[\u0900-\u097F]/.test(sc.say||'')) ?
         '<span style="font-size:11px;color:#f87171;font-weight:700">● narration</span>' :
@@ -445,7 +464,7 @@ function sceneHTML(sc, ci, si) {
    Khali scene banane par check_content fail hota hai — isliye sample text. */
 function blankScene(id) {
   return {
-    id: id, type: 'concept',
+    id: id, type: 'concept', layout: 'concept',
     say: 'यहाँ अपनी बात लिखो — पहले problem, फिर solution, आसान example के साथ।',
     subtitle: 'Type your point here',
     keyword: 'New point',
@@ -558,7 +577,14 @@ document.addEventListener('change', (e) => {
   const t = e.target;
   if (t.classList.contains('scene-type-sel')) {
     const ci=+t.dataset.c, si=+t.dataset.s;
-    CONTENT.chapters[ci].scenes[si].type = t.value;
+    const sc = CONTENT.chapters[ci].scenes[si];
+    sc.type = t.value;
+    sc.layout = (LAYOUTS[t.value] || ['concept'])[0];   // type badla to default layout
+    renderScript();
+  }
+  if (t.classList.contains('scene-layout-sel')) {
+    const ci=+t.dataset.c, si=+t.dataset.s;
+    CONTENT.chapters[ci].scenes[si].layout = t.value;
     renderScript();
   }
 });

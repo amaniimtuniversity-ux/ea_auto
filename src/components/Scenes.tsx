@@ -609,3 +609,437 @@ export const RecapScene: React.FC<Common> = ({keyword, bullets}) => {
     </Stage>
   );
 };
+
+/* =====================================================================
+ * Extra layouts (by raghv) — content.ts ke `layout` field se chunte hain.
+ * Sab ek hi Stage par rehte hain, isliye subtitle band aur chrome kabhi
+ * nahi tootte. Text English, voice Hindi — wahi rule.
+ * ===================================================================== */
+
+/* ------------------------------------------------------------- quote */
+export const QuoteScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  const a = easeOut(frame, 6, 22);
+  return (
+    <Stage>
+      <div style={{display: 'flex', gap: 28, alignItems: 'flex-start', opacity: a}}>
+        <div
+          style={{
+            fontFamily: FONT.latin, fontSize: 150, lineHeight: 0.7, fontWeight: 800,
+            color: COLORS.accent, opacity: 0.85, transform: `translateY(${rise(frame, 6, 26, 14)}px)`,
+          }}
+        >
+          “
+        </div>
+        <div style={{flex: 1, minWidth: 0}}>
+          <div
+            style={{
+              fontFamily: FONT.latin, fontSize: 60, fontWeight: 700, lineHeight: 1.28,
+              letterSpacing: -1.2, color: COLORS.text,
+            }}
+          >
+            {keyword}
+          </div>
+          <BulletList items={bullets} start={30} />
+        </div>
+      </div>
+    </Stage>
+  );
+};
+
+/* ------------------------------------------------------------ bigword */
+export const BigWordScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  const scale = 0.92 + 0.08 * pop(frame, 4, 26);
+  return (
+    <Stage style={{alignItems: 'center', textAlign: 'center'}}>
+      <div
+        style={{
+          fontFamily: FONT.latin, fontSize: 132, fontWeight: 900, letterSpacing: -5,
+          color: COLORS.text, transform: `scale(${scale})`, lineHeight: 1.02,
+        }}
+      >
+        {keyword}
+      </div>
+      <div style={{display: 'flex', gap: 16, marginTop: 30, flexWrap: 'wrap', justifyContent: 'center'}}>
+        {(bullets || []).slice(0, 3).map((b, i) => (
+          <div
+            key={b}
+            style={{
+              fontFamily: FONT.latin, fontSize: 22, color: COLORS.accent,
+              border: `1.5px solid ${COLORS.accent}55`, borderRadius: 99,
+              padding: '10px 20px', opacity: easeOut(frame, 24 + i * 8, 16),
+            }}
+          >
+            {b}
+          </div>
+        ))}
+      </div>
+    </Stage>
+  );
+};
+
+/* ------------------------------------------------------------ bullets */
+export const BulletsScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  return (
+    <Stage>
+      <div style={{fontFamily: FONT.latin, fontSize: 54, fontWeight: 800, letterSpacing: -1.4,
+                   color: COLORS.text, marginBottom: 34}}>
+        {keyword}
+      </div>
+      {(bullets || []).slice(0, 5).map((b, i) => (
+        <div
+          key={b}
+          style={{
+            display: 'flex', alignItems: 'flex-start', gap: 18, marginBottom: 18,
+            opacity: easeOut(frame, 12 + i * 9, 18),
+            transform: `translateX(${rise(frame, 12 + i * 9, 24, 26)}px)`,
+          }}
+        >
+          <div style={{width: 12, height: 12, borderRadius: 4, background: COLORS.accent,
+                       marginTop: 14, flexShrink: 0}} />
+          <div style={{fontFamily: FONT.latin, fontSize: 32, lineHeight: 1.45, color: COLORS.textDim}}>
+            {b}
+          </div>
+        </div>
+      ))}
+    </Stage>
+  );
+};
+
+/* ------------------------------------------------------------- cards */
+export const CardsScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  const items = (bullets || []).slice(0, 4);
+  return (
+    <Stage>
+      <div style={{fontFamily: FONT.latin, fontSize: 44, fontWeight: 800, color: COLORS.text,
+                   marginBottom: 30, letterSpacing: -1}}>
+        {keyword}
+      </div>
+      <div style={{display: 'flex', gap: 18, flexWrap: 'wrap'}}>
+        {items.map((b, i) => (
+          <div
+            key={b}
+            style={{
+              flex: `1 1 ${items.length > 2 ? '42%' : '48%'}`, minWidth: 0,
+              background: COLORS.panel, border: `1.5px solid ${COLORS.panelEdge}`,
+              borderRadius: 18, padding: '22px 24px',
+              opacity: easeOut(frame, 10 + i * 10, 20),
+              transform: `translateY(${rise(frame, 10 + i * 10, 28, 20)}px)`,
+            }}
+          >
+            <div style={{fontFamily: FONT.mono, fontSize: 15, color: COLORS.accent,
+                         letterSpacing: 2, marginBottom: 10}}>
+              {`0${i + 1}`}
+            </div>
+            <div style={{fontFamily: FONT.latin, fontSize: 25, lineHeight: 1.4, color: COLORS.text}}>
+              {b}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Stage>
+  );
+};
+
+/* ----------------------------------------------------------- two-col */
+export const TwoColScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  const all = bullets || [];
+  const half = Math.max(1, Math.ceil(all.length / 2));
+  const col = (items: string[], side: number) => (
+    <div style={{flex: 1, minWidth: 0}}>
+      {items.map((b, i) => (
+        <div key={b} style={{
+          fontFamily: FONT.latin, fontSize: 27, lineHeight: 1.45, color: COLORS.textDim,
+          padding: '12px 0 12px 20px', borderLeft: `3px solid ${side === 0 ? COLORS.accent : COLORS.cool}`,
+          marginBottom: 8, opacity: easeOut(frame, 14 + (side * 6 + i) * 9, 18),
+        }}>
+          {b}
+        </div>
+      ))}
+    </div>
+  );
+  return (
+    <Stage>
+      <div style={{fontFamily: FONT.latin, fontSize: 50, fontWeight: 800, color: COLORS.text,
+                   marginBottom: 32, letterSpacing: -1.2}}>
+        {keyword}
+      </div>
+      <div style={{display: 'flex', gap: 40}}>
+        {col(all.slice(0, half), 0)}
+        {all.length > 1 ? col(all.slice(half), 1) : <div style={{flex: 1}} />}
+      </div>
+    </Stage>
+  );
+};
+
+/* --------------------------------------------------------- timeline */
+export const TimelineScene: React.FC<Common & {steps?: {label: string; note?: string}[]}> = ({
+  keyword, steps,
+}) => {
+  const frame = useCurrentFrame();
+  const items = (steps || []).slice(0, 5);
+  return (
+    <Stage>
+      <div style={{fontFamily: FONT.latin, fontSize: 24, fontWeight: 800, color: COLORS.textDim,
+                   letterSpacing: 3, marginBottom: 34, textTransform: 'uppercase'}}>
+        {keyword}
+      </div>
+      <div style={{position: 'relative', paddingLeft: 6}}>
+        <div style={{position: 'absolute', left: 21, top: 10, bottom: 10, width: 2,
+                     background: COLORS.panelEdge}} />
+        {items.map((st, i) => (
+          <div key={st.label} style={{
+            display: 'flex', gap: 26, alignItems: 'flex-start', marginBottom: 24, position: 'relative',
+            opacity: easeOut(frame, 12 + i * 12, 20),
+            transform: `translateY(${rise(frame, 12 + i * 12, 26, 18)}px)`,
+          }}>
+            <div style={{
+              width: 32, height: 32, borderRadius: 99, flexShrink: 0, zIndex: 1,
+              background: COLORS.bg, border: `2.5px solid ${COLORS.accent}`,
+              display: 'grid', placeItems: 'center',
+              fontFamily: FONT.mono, fontSize: 15, color: COLORS.accent,
+            }}>
+              {i + 1}
+            </div>
+            <div>
+              <div style={{fontFamily: FONT.latin, fontSize: 28, fontWeight: 700, color: COLORS.text}}>
+                {st.label}
+              </div>
+              {st.note ? (
+                <div style={{fontFamily: FONT.latin, fontSize: 21, color: COLORS.textDim, marginTop: 4}}>
+                  {st.note}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Stage>
+  );
+};
+
+/* --------------------------------------------------------- numbered */
+export const NumberedScene: React.FC<Common & {steps?: {label: string; note?: string}[]}> = ({
+  keyword, steps,
+}) => {
+  const frame = useCurrentFrame();
+  const items = (steps || []).slice(0, 4);
+  return (
+    <Stage>
+      <div style={{fontFamily: FONT.latin, fontSize: 40, fontWeight: 800, color: COLORS.text,
+                   marginBottom: 28, letterSpacing: -1}}>
+        {keyword}
+      </div>
+      <div style={{display: 'flex', gap: 16}}>
+        {items.map((st, i) => (
+          <div key={st.label} style={{
+            flex: 1, minWidth: 0, background: COLORS.panel, borderRadius: 18,
+            border: `1.5px solid ${COLORS.panelEdge}`, padding: '24px 20px',
+            opacity: easeOut(frame, 10 + i * 11, 20),
+            transform: `translateY(${rise(frame, 10 + i * 11, 30, 24)}px)`,
+          }}>
+            <div style={{fontFamily: FONT.latin, fontSize: 60, fontWeight: 900,
+                         color: COLORS.accent, lineHeight: 1, marginBottom: 14}}>
+              {i + 1}
+            </div>
+            <div style={{fontFamily: FONT.latin, fontSize: 24, fontWeight: 700, color: COLORS.text}}>
+              {st.label}
+            </div>
+            {st.note ? (
+              <div style={{fontFamily: FONT.latin, fontSize: 18, color: COLORS.textDim, marginTop: 8}}>
+                {st.note}
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </Stage>
+  );
+};
+
+/* ----------------------------------------------------------- versus */
+export const VersusScene: React.FC<
+  Common & {left?: {label: string; points: string[]} | null; right?: {label: string; points: string[]} | null}
+> = ({keyword, left, right}) => {
+  const frame = useCurrentFrame();
+  const side = (data: typeof left, toward: number, color: string, delay: number) =>
+    data ? (
+      <div style={{
+        flex: 1, minWidth: 0, background: COLORS.panel, borderRadius: 20,
+        border: `2px solid ${color}44`, padding: '26px 28px',
+        opacity: easeOut(frame, delay, 22),
+        transform: `translateX(${toward * (1 - pop(frame, delay, 26)) * 40}px)`,
+      }}>
+        <div style={{fontFamily: FONT.latin, fontSize: 27, fontWeight: 800, color, marginBottom: 16}}>
+          {data.label}
+        </div>
+        {data.points.slice(0, 4).map((p) => (
+          <div key={p} style={{fontFamily: FONT.latin, fontSize: 22, color: COLORS.textDim,
+                               lineHeight: 1.5, marginBottom: 8}}>
+            {p}
+          </div>
+        ))}
+      </div>
+    ) : null;
+  return (
+    <Stage>
+      {keyword ? (
+        <div style={{fontFamily: FONT.latin, fontSize: 38, fontWeight: 800, color: COLORS.text,
+                     marginBottom: 26, letterSpacing: -1}}>
+          {keyword}
+        </div>
+      ) : null}
+      <div style={{display: 'flex', alignItems: 'center', gap: 22}}>
+        {side(left, -1, COLORS.warn, 10)}
+        <div style={{
+          fontFamily: FONT.latin, fontSize: 26, fontWeight: 900, color: COLORS.textDim,
+          letterSpacing: 3, opacity: easeOut(frame, 24, 18), flexShrink: 0,
+        }}>
+          VS
+        </div>
+        {side(right, 1, COLORS.good, 18)}
+      </div>
+    </Stage>
+  );
+};
+
+/* ------------------------------------------------------------ table */
+export const TableScene: React.FC<
+  Common & {keyword?: string; left?: {label: string; points: string[]} | null; right?: {label: string; points: string[]} | null}
+> = ({keyword, left, right}) => {
+  const frame = useCurrentFrame();
+  const rows = Math.max(left?.points.length || 0, right?.points.length || 0);
+  const cell = (txt: string | undefined, i: number, color: string) => (
+    <div key={i} style={{
+      fontFamily: FONT.latin, fontSize: 22, color: COLORS.textDim, lineHeight: 1.4,
+      padding: '13px 4px', borderTop: i ? `1px solid ${COLORS.panelEdge}` : 'none',
+      opacity: txt ? easeOut(frame, 16 + i * 8, 16) : 0,
+    }}>
+      {txt || '—'}
+    </div>
+  );
+  return (
+    <Stage>
+      {keyword ? (
+        <div style={{fontFamily: FONT.latin, fontSize: 38, fontWeight: 800, color: COLORS.text,
+                     marginBottom: 26, letterSpacing: -1}}>
+          {keyword}
+        </div>
+      ) : null}
+      <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 48px'}}>
+        <div style={{fontFamily: FONT.latin, fontSize: 24, fontWeight: 800, color: COLORS.warn,
+                     paddingBottom: 10, borderBottom: `2px solid ${COLORS.warn}66`}}>
+          {left?.label || 'A'}
+        </div>
+        <div style={{fontFamily: FONT.latin, fontSize: 24, fontWeight: 800, color: COLORS.good,
+                     paddingBottom: 10, borderBottom: `2px solid ${COLORS.good}66`}}>
+          {right?.label || 'B'}
+        </div>
+        {Array.from({length: rows}, (_, i) => (
+          <React.Fragment key={i}>
+            {cell(left?.points[i], i, COLORS.warn)}
+            {cell(right?.points[i], i, COLORS.good)}
+          </React.Fragment>
+        ))}
+      </div>
+    </Stage>
+  );
+};
+
+/* -------------------------------------------------------------- stat */
+export const StatScene: React.FC<Common & {value?: string; unit?: string; caption?: string}> = ({
+  value, unit, caption, bullets,
+}) => {
+  const frame = useCurrentFrame();
+  return (
+    <Stage style={{alignItems: 'flex-start'}}>
+      <div style={{display: 'flex', alignItems: 'baseline', gap: 18,
+                   transform: `scale(${0.94 + 0.06 * pop(frame, 4, 24)})`, transformOrigin: 'left bottom'}}>
+        <div style={{fontFamily: FONT.latin, fontSize: 150, fontWeight: 900, lineHeight: 0.95,
+                     letterSpacing: -6, color: COLORS.accent}}>
+          {value}
+        </div>
+        <div style={{fontFamily: FONT.latin, fontSize: 40, fontWeight: 700, color: COLORS.textDim}}>
+          {unit}
+        </div>
+      </div>
+      {/* highlight bar */}
+      <div style={{
+        height: 6, borderRadius: 99, background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.cool})`,
+        width: `${Math.min(100, 30 + (bullets?.length || 0) * 15)}%`, margin: '18px 0 22px',
+        opacity: easeOut(frame, 18, 20),
+      }} />
+      <div style={{fontFamily: FONT.latin, fontSize: 28, color: COLORS.text, lineHeight: 1.45}}>
+        {caption}
+      </div>
+      <BulletList items={bullets} start={34} />
+    </Stage>
+  );
+};
+
+/* -------------------------------------------------------- checklist */
+export const ChecklistScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  const items = (bullets || []).slice(0, 5);
+  return (
+    <Stage>
+      <div style={{fontFamily: FONT.latin, fontSize: 42, fontWeight: 800, color: COLORS.text,
+                   marginBottom: 28, letterSpacing: -0.8}}>
+        {keyword}
+      </div>
+      {items.map((b, i) => (
+        <div key={b} style={{
+          display: 'flex', alignItems: 'center', gap: 18, marginBottom: 14,
+          opacity: easeOut(frame, 12 + i * 10, 18),
+        }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" style={{flexShrink: 0}}>
+            <circle cx="12" cy="12" r="11" fill="none" stroke={COLORS.good} strokeWidth="2" />
+            <path d="M7 12.4l3.3 3.3L17 8.8" fill="none" stroke={COLORS.good} strokeWidth="2.6"
+                  strokeLinecap="round" strokeLinejoin="round"
+                  strokeDasharray="18" strokeDashoffset={18 * (1 - pop(frame, 18 + i * 10, 16))} />
+          </svg>
+          <div style={{fontFamily: FONT.latin, fontSize: 29, color: COLORS.text, lineHeight: 1.4}}>
+            {b}
+          </div>
+        </div>
+      ))}
+    </Stage>
+  );
+};
+
+/* -------------------------------------------------------- takeaways */
+export const TakeawaysScene: React.FC<Common> = ({keyword, bullets}) => {
+  const frame = useCurrentFrame();
+  const items = (bullets || []).slice(0, 3);
+  return (
+    <Stage style={{alignItems: 'center', textAlign: 'center'}}>
+      <div style={{fontFamily: FONT.latin, fontSize: 26, fontWeight: 700, letterSpacing: 4,
+                   textTransform: 'uppercase', color: COLORS.cool, marginBottom: 16}}>
+        {keyword}
+      </div>
+      <div style={{display: 'flex', gap: 18, marginTop: 10}}>
+        {items.map((b, i) => (
+          <div key={b} style={{
+            width: 250, background: COLORS.panel, borderRadius: 20,
+            border: `1.5px solid ${i === items.length - 1 ? COLORS.accent : COLORS.panelEdge}`,
+            padding: '24px 20px',
+            opacity: easeOut(frame, 14 + i * 12, 20),
+            transform: `translateY(${rise(frame, 14 + i * 12, 30, 26)}px)`,
+          }}>
+            <div style={{fontFamily: FONT.mono, fontSize: 14, color: COLORS.cool,
+                         letterSpacing: 2, marginBottom: 12}}>
+              {`0${i + 1}`}
+            </div>
+            <div style={{fontFamily: FONT.latin, fontSize: 23, lineHeight: 1.4, color: COLORS.text}}>
+              {b}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Stage>
+  );
+};
