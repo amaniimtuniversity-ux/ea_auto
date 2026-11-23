@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use kathareel in your work, please cite it as below."
+title: "kathareel"
+type: software
+authors:
+  - family-names: raghv
+    given-names: raghv
+    alias: raghv
+repository-code: "https://github.com/<your-github-user>/kathareel"
+url: "https://github.com/<your-github-user>/kathareel"
+abstract: >-
+  A Claude Code / Codex skill that turns any topic into a narrated motion-graphics
+  explainer video with a Hinglish (Hindi-in-Latin-script) voiceover and an
+  English-only board: English titles, chapter cards, HUD, progress bar and subtitles.
+  Black canvas with a star-field or dot-field backdrop, white line art with purple
+  accents, word-aligned subtitles and a chapter progress bar; every frame is drawn in
+  code with Remotion (React + TypeScript). Ships a compilable template, primitives and
+  lighting library, voiceover / storyboard / render / QC tooling, written style and
+  motion specs, a multi-agent build protocol and a complete reference film as the
+  quality bar. Derived from the open-source anything2explainer project by Vincent Wei.
+keywords:
+  - claude-code
+  - codex
+  - agent-skill
+  - remotion
+  - explainer-video
+  - motion-graphics
+  - hinglish
+  - text-to-video
+  - tts
+  - multi-agent
+license: PolyForm-Noncommercial-1.0.0
+date-released: "2026-11-23"

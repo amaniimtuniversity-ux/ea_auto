@@ -1,0 +1,18 @@
+# Narration template by raghv - HINGLISH voiceover, ENGLISH board. Delete this comment, then write per reference/narration-storyboard.md.
+# VOICE RULE: write the narration in Hinglish - Hindi spoken, Latin script only ("matlab kya hai", "samajh lo"). No Devanagari.
+# BOARD RULE: everything on screen (title, chapters, HUD, progress bar, subtitles, labels, end credit) is ENGLISH ONLY.
+#   So every sentence below is spoken Hinglish, and the same line is also the subtitle text -> keep the wording English-light
+#   (technical nouns in English, glue words in Hinglish reads fine on screen) and keep each subtitle block <=48 characters.
+# `# CHAPTER n Chapter Title` for chapters (English, <=14 chars); one sentence per line; `|` only splits subtitle blocks.
+# **Blank line = paragraph break**: one paragraph = one shot (2-4 sentences), hold 1-1.5s at paragraph end before cutting.
+# Keep `# CHAPTER 1 ...` as the first chapter line; chapter names are English navigation labels: "Why RAG", "Retrieval", ...
+# CHAPTER 1 Why RAG
+Pehle problem samajh lo|ek language model|apni yaad se hi jawab deta hai|aur galat bhi bol sakta hai
+Uske paas tumhare documents nahi hote|na hi koi source|jisse wo jawab check kar sake
+
+Isi gap ko RAG bharta hai|model ko jawab dene se pehle|sahi document dikha diye jaate hain
+# CHAPTER 2 How It Works
+Ab dekho pipeline kaise chalti hai|pehle documents chhote chunks me toote jaate hain|har chunk ka number banta hai
+Sawaal aaya to pehle usko|wahi number space me convert karte hain|phir sabse kareebi chunks uthate hain
+
+Ye chunks model ko context ke roop me|diye jaate hain|aur jawab unhi ke aadhar par likha jaata hai
