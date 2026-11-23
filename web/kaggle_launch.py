@@ -105,11 +105,15 @@ def main():
     time.sleep(28)
 
     print('\n' + '=' * 72)
-    print('  AGAR upar PUBLIC https://....trycloudflare.com URL dikha:')
-    print('     -> wahi kholo, sabse aasan raasta')
+    print('  DO URL milte hain — dono kaam karte hain:')
     print()
-    print('  YA Kaggle ka apna proxy URL (hamesha chalta hai):')
+    print('  1) STABLE (recommended) — Kaggle ka apna proxy, kabhi nahi marta:')
     print('     https://www.kaggle.com/code/<YOUR-USER>/<YOUR-NOTEBOOK>/proxy/%d/' % PORT)
+    print()
+    print('  2) PUBLIC — https://....trycloudflare.com  (upar printed)')
+    print('     Note: ye free tunnel 2-3 ghante me ya server restart par mar sakta hai.')
+    print('     Mara to studio khud naya banata hai — /api/health me current URL milta hai.')
+    print('     Isliye roz ke kaam ke liye Kaggle proxy URL hi bookmark karo.')
     print('\n  (server background me chalu hai — notebook band karne tak zinda rahega)')
     print('=' * 72, flush=True)
 

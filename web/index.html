@@ -141,6 +141,7 @@
     <div class="logo"><div class="dot">▶</div> kathareel <span class="tag">studio</span></div>
     <div class="spacer"></div>
     <span class="pill" id="envpill">checking…</span>
+    <a class="pill" id="linkpill" style="display:none" target="_blank" rel="noopener">🔗 current link</a>
     <span class="pill" id="voicepill">voice: edge · Madhur</span>
   </div>
 </header>
@@ -573,6 +574,11 @@ function loadVideo(mtime) {
   try {
     const h = await jfetch(api('/api/health'));
     $('envpill').textContent = `node ${h.node?'✓':'✗'} · ffmpeg ${h.ffmpeg?'✓':'✗'}`;
+    if (h.tunnel_url) {
+      const a = $('linkpill');
+      a.href = h.tunnel_url; a.style.display = 'inline-block';
+      a.title = 'Ye tunnel girne par badal jata hai — bookmark purana ho to yahan se naya lo';
+    }
     $('envpill').className = 'pill ' + (h.node && h.ffmpeg ? 'ok':'bad');
     if (!h.ffmpeg || !h.node) {
       const gone = [!h.ffmpeg && 'ffmpeg', !h.node && 'node'].filter(Boolean).join(' + ');
@@ -591,6 +597,15 @@ function loadVideo(mtime) {
 
   const s = await jfetch(api('/api/status'));
   if (s.has_video) loadVideo(s.video_mtime);
+
+  // tunnel URL badal sakta hai — har 20s check karo
+  setInterval(async () => {
+    try {
+      const h = await jfetch(api('/api/health'));
+      const a = $('linkpill');
+      if (h.tunnel_url) { a.href = h.tunnel_url; a.style.display = 'inline-block'; }
+    } catch (_) { /* ignore */ }
+  }, 20000);
 })();
 </script>
 </body>

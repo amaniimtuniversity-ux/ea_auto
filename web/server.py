@@ -263,7 +263,8 @@ def font(name: str):
 @app.get('/api/health')
 def health():
     return {'ok': True, 'root': ROOT, 'node': shutil.which('node') is not None,
-            'ffmpeg': shutil.which('ffmpeg') is not None}
+            'ffmpeg': shutil.which('ffmpeg') is not None,
+            'tunnel_url': TUNNEL.url}
 
 
 def _port_open(port, host='127.0.0.1', timeout=0.4):
@@ -273,31 +274,101 @@ def _port_open(port, host='127.0.0.1', timeout=0.4):
         return sock.connect_ex((host, port)) == 0
 
 
-def _start_cloudflared(port):
-    """Public https URL bina account ke. Kaggle me weda nahi -> None."""
-    exe = shutil.which('cloudflared')
-    if not exe:
+URL_FILE = '/tmp/kathareel_url.txt'
+
+
+class Tunnel:
+    """cloudflared ko zinda rakhta hai; mar jaye to naya URL bana kar restart.
+
+    Free quick tunnels ka URL har restart par badalta hai, isliye:
+      - URL file me likha jata hai (UI use dikhati hai)
+      - tunnel girne par khud dobara khada hota hai
+      - /api/health me current URL aata hai
+    """
+
+    def __init__(self, port, enabled=True):
+        self.port = port
+        self.enabled = enabled
+        self.url = None
+        self.proc = None
+        self._stop = threading.Event()
+        self._thread = None
+
+    # --- internals -----------------------------------------------------
+    def _find_exe(self):
+        exe = shutil.which('cloudflared')
+        if exe:
+            return exe
+        if os.path.exists('/tmp/cloudflared'):
+            return '/tmp/cloudflared'
         subprocess.run(['bash', '-lc',
-                        'curl -fsSL -o /tmp/cloudflared https://github.com/cloudflare/cloudflared/'
-                        'releases/latest/download/cloudflared-linux-amd64 && chmod +x /tmp/cloudflared'],
+                        'curl -fsSL -o /tmp/cloudflared '
+                        'https://github.com/cloudflare/cloudflared/releases/latest/download/'
+                        'cloudflared-linux-amd64 && chmod +x /tmp/cloudflared'],
                        capture_output=True)
-        exe = '/tmp/cloudflared' if os.path.exists('/tmp/cloudflared') else None
-    if not exe:
-        return None
-    log = '/tmp/cloudflared.log'
-    open(log, 'w').close()
-    subprocess.Popen([exe, 'tunnel', '--url', f'http://127.0.0.1:{port}', '--no-autoupdate'],
-                     stdout=open(log, 'w'), stderr=subprocess.STDOUT)
-    pat = re.compile(r'https://[a-z0-9-]+\.trycloudflare\.com')
-    for _ in range(60):
-        time.sleep(0.5)
-        try:
-            found = pat.search(open(log).read())
+        return '/tmp/cloudflared' if os.path.exists('/tmp/cloudflared') else None
+
+    def _spawn(self):
+        exe = self._find_exe()
+        if not exe:
+            return False
+        log = '/tmp/cloudflared.log'
+        open(log, 'w').close()
+        self.proc = subprocess.Popen(
+            [exe, 'tunnel', '--url', f'http://127.0.0.1:{self.port}', '--no-autoupdate'],
+            stdout=open(log, 'w'), stderr=subprocess.STDOUT)
+        pat = re.compile(r'https://[a-z0-9-]+\.trycloudflare\.com')
+        for _ in range(80):
+            if self._stop.is_set():
+                return False
+            time.sleep(0.5)
+            try:
+                found = pat.search(open(log, encoding='utf-8', errors='ignore').read())
+            except OSError:
+                found = None
             if found:
-                return found.group(0)
-        except OSError:
-            pass
-    return None
+                self.url = found.group(0)
+                with open(URL_FILE, 'w') as f:
+                    f.write(self.url)
+                print(f'  PUBLIC  : {self.url}', flush=True)
+                return True
+            if self.proc.poll() is not None:
+                return False
+        return False
+
+    def _run(self):
+        backoff = 2
+        while not self._stop.is_set():
+            ok = self._spawn()
+            if ok:
+                backoff = 2
+            else:
+                print('  tunnel start nahi hua — 15s me retry', flush=True)
+                time.sleep(15)
+                continue
+            # tunnel process ke marne tak wait
+            while not self._stop.is_set() and self.proc and self.proc.poll() is None:
+                time.sleep(2)
+            if self._stop.is_set():
+                break
+            print(f'  tunnel gir gaya — {backoff}s me naya URL', flush=True)
+            self.url = None
+            time.sleep(backoff)
+            backoff = min(30, backoff * 2)
+
+    # --- public --------------------------------------------------------
+    def start(self):
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+        return self
+
+    def stop(self):
+        self._stop.set()
+        if self.proc and self.proc.poll() is None:
+            self.proc.terminate()
+
+
+TUNNEL = Tunnel(0, enabled=False)
 
 
 def main():
@@ -318,14 +389,12 @@ def main():
         time.sleep(0.25)
 
     banner = [f'  local   : http://127.0.0.1:{a.port}']
-    if a.public:
-        url = _start_cloudflared(a.port) if a.tunnel == 'cloudflared' else None
-        if url:
-            banner.append(f'  PUBLIC  : {url}')
-        else:
-            banner.append('  public URL nahi bana (internet off?)')
+    if a.public and a.tunnel == 'cloudflared':
+        TUNNEL.port = a.port
+        TUNNEL.enabled = True
+        TUNNEL.start()          # pehla URL print khud karega
         banner.append(f'  Kaggle  : https://www.kaggle.com/code/<your-notebook>/proxy/{a.port}/')
-        banner.append(f'  Colab   : https://<your-colab>.colab.googleusercontent.com/proxy/{a.port}/')
+        banner.append('  (tunnel girne par naya URL khud ban jata hai — /api/health me dekho)')
 
     print('\n' + '=' * 74)
     print('  kathareel studio — ready')

@@ -248,3 +248,12 @@ public/fonts/             Noto Sans, Noto Sans Devanagari, Inter, JetBrains Mono
 Built by **raghv**. Fonts are SIL OFL 1.1 (`public/fonts/OFL.txt`).
 The method was inspired by the broader "explainer video from code" idea; everything in this repo is written
 from scratch — see [LICENSE](LICENSE).
+
+### Link kaun sa use karna hai
+
+| Link | Kab tak chalta hai |
+|---|---|
+| `https://www.kaggle.com/code/<user>/<notebook>/proxy/8000/` | **Hamesha** — Kaggle notebook chal raha ho to chalta hai. Roz ke kaam ke liye yahi bookmark karo. |
+| `https://....trycloudflare.com` | Free tunnel — 2–3 ghante me ya restart par mar sakta hai, phir naya ban jata hai. Server `/api/health` me current URL deta hai aur UI ke top-right 🔗 button me dikhata hai. |
+
+Tunnel marne par server khud naya banata hai (backoff ke saath), kaam rukta nahi.
