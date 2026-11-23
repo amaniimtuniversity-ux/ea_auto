@@ -87,12 +87,33 @@ python3 scripts/build_voice.py --check                # timings only, no audio
 - Bring your own voice? Drop any wav at `public/voice/<slug>.wav` with matching length and keep the timeline
   the script produced (or hand-edit `src/timeline.ts`).
 
+## CPU or GPU?
+
+**GPU ki zaroorat nahi, aur GPU se fayda bhi nahi.** Remotion headless Chromium me frames banata hai
+aur ffmpeg se video encode karta hai — dono CPU par. Hamare scenes plain 2D + CSS hain (koi WebGL nahi),
+isliye GPU ko kaam nahi milta.
+
+Speed **CPU cores** se aati hai (`--concurrency`). Is project par naapa hua (150 frames, 2-core machine):
+
+| Setting | Time |
+|---|---|
+| `--concurrency=1` | 25.3 s |
+| `--concurrency=2` | **12.7 s** ← 2x, sirf CPU parallelism |
+| `--concurrency=2 --gl=swiftshader` | 13.7 s (koi fayda nahi) |
+
+- Kaggle/Colab: **Accelerator = None**, `--concurrency=2` (2 cores).
+- Apne laptop par: `--concurrency=$(nproc)`.
+- GPU machine ho to `--gl=angle-egl` ya `--gl=vulkan` try kar sakte ho — correctness par asar nahi padta.
+
+Poori detail + tuning: [`docs/CORE-USAGE.md`](docs/CORE-USAGE.md)
+
 ## Requirements
 
 ```bash
 node -v      # 18+
 python3 -V   # 3.10+
 ffmpeg -version
+# GPU ki zaroorat NAHI — sab kuch CPU par chalta hai
 pip install edge-tts numpy          # cloud Hindi voices (default)
 pip install piper-tts               # optional: offline voices
 ```
