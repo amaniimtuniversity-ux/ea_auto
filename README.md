@@ -80,6 +80,29 @@ python3 scripts/new_topic.py --topic "photosynthesis" \
 ```
 Har `--say` ek scene banta hai. `--subtitle` aur `--keyword` usi order me.
 
+## Web studio (browser se poora flow)
+
+Script ko terminal me edit karne ki zaroorat nahi — ek page par sab kuch:
+
+```bash
+python3 web/kaggle_launch.py       # Kaggle/Colab: setup + public URL
+python3 web/server.py --port 8000  # laptop par
+```
+
+Banner me jo URL aaye use kholo. Page par:
+
+| Step | Kya hota hai |
+|---|---|
+| 1 · Script | topic + minutes → outline banti hai; har scene ka Hindi narration, English caption, keyword, bullets, steps, number, compare — sab editable |
+| 2 · Length | live duration vs target, "17s kam hai — 45 words add karo" |
+| 3 · Generate video | Hindi voice + render, live log + progress steps |
+| 4 · Result | video browser me play, voiceover audio check, mp4 download |
+
+Kaggle par URL aisa hota hai: `https://www.kaggle.com/code/<user>/<notebook>/proxy/8000/`
+
+No CDN, no build step — poora UI ek hi `web/index.html` me inline hai.
+
+
 ## Quick start (manual)
 
 ```bash

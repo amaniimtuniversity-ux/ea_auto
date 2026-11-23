@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>kathareel studio — Hinglish explainer video</title>
+<style>
+  @font-face{font-family:'NotoDeva';src:url('/fonts/NotoSansDevanagari.ttf') format('truetype');font-weight:100 900;font-display:swap}
+  @font-face{font-family:'InterLocal';src:url('/fonts/Inter.ttf') format('truetype');font-weight:100 900;font-display:swap}
+
+  :root{
+    --bg:#0a0c11; --bg2:#0e1118; --panel:#141824; --panel2:#1b2130;
+    --edge:#252c3d; --edge2:#323b52;
+    --text:#eef2f9; --dim:#9aa4b8; --faint:#616b80;
+    --accent:#ff6b2c; --accent-d:#e2551a; --accent-s:#ffb38a;
+    --cool:#3bc9f5; --good:#4ade80; --warn:#fbbf24; --bad:#f87171;
+    --r:14px; --r-sm:9px;
+    --sh:0 18px 50px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:'InterLocal','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  body{background:radial-gradient(1100px 600px at 12% -10%,rgba(255,107,44,.09),transparent 60%),
+                    radial-gradient(900px 500px at 95% 8%,rgba(59,201,245,.07),transparent 60%),var(--bg);
+       min-height:100vh}
+  a{color:var(--accent-s);text-decoration:none}
+  /* ---------- top bar ---------- */
+  header{position:sticky;top:0;z-index:50;backdrop-filter:blur(14px);
+    background:rgba(10,12,17,.82);border-bottom:1px solid var(--edge)}
+  .hwrap{max-width:1440px;margin:0 auto;padding:14px 26px;display:flex;align-items:center;gap:16px}
+  .logo{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.4px;font-size:18px}
+  .logo .dot{width:26px;height:26px;border-radius:8px;
+    background:linear-gradient(135deg,var(--accent),#ff2d55);box-shadow:0 0 22px rgba(255,107,44,.5);
+    display:grid;place-items:center;font-size:13px;color:#1a0d06}
+  .tag{font-size:11.5px;color:var(--faint);letter-spacing:.14em;text-transform:uppercase}
+  .spacer{flex:1}
+  .pill{font-size:12px;padding:6px 12px;border-radius:99px;border:1px solid var(--edge2);color:var(--dim)}
+  .pill.ok{border-color:rgba(74,222,128,.35);color:var(--good);background:rgba(74,222,128,.08)}
+  .pill.bad{border-color:rgba(248,113,113,.35);color:var(--bad);background:rgba(248,113,113,.08)}
+  /* ---------- layout ---------- */
+  main{max-width:1440px;margin:0 auto;padding:26px;display:grid;
+    grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
+  @media(max-width:1050px){main{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg2));
+    border:1px solid var(--edge);border-radius:var(--r);box-shadow:var(--sh)}
+  .card-h{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--edge)}
+  .card-h h2{margin:0;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .card-b{padding:20px}
+  /* ---------- form ---------- */
+  label.f{display:block;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 7px;font-weight:600}
+  input,textarea,select{width:100%;background:var(--bg);border:1px solid var(--edge2);
+    color:var(--text);border-radius:var(--r-sm);padding:11px 13px;font-size:14px;font-family:inherit;
+    transition:border-color .15s,box-shadow .15s}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(255,107,44,.13)}
+  textarea{resize:vertical;line-height:1.6}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .row3{display:grid;grid-template-columns:1fr 130px 1fr;gap:14px}
+  .field{margin-bottom:16px}
+  .hint{font-size:12px;color:var(--faint);margin-top:6px;line-height:1.5}
+  button{cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;border-radius:var(--r-sm);
+    border:1px solid var(--edge2);background:var(--panel2);color:var(--text);padding:11px 18px;
+    transition:transform .1s,background .15s,border-color .15s}
+  button:hover{background:#232b3d;border-color:#3f4a64}
+  button:active{transform:translateY(1px)}
+  button.primary{background:linear-gradient(135deg,var(--accent),var(--accent-d));border:none;
+    color:#1a0d06;box-shadow:0 8px 24px rgba(255,107,44,.35)}
+  button.primary:hover{filter:brightness(1.07)}
+  button.primary:disabled{opacity:.45;cursor:not-allowed;filter:none;box-shadow:none}
+  button.ghost{background:transparent}
+  button.danger{border-color:rgba(248,113,113,.4);color:var(--bad);background:rgba(248,113,113,.07)}
+  button.sm{padding:7px 11px;font-size:12.5px}
+  /* ---------- script list ---------- */
+  .chapter{border:1px solid var(--edge);border-radius:12px;margin-bottom:14px;overflow:hidden;
+    background:rgba(20,24,36,.6)}
+  .chapter-h{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--panel2);
+    border-bottom:1px solid var(--edge)}
+  .chapter-h input{background:transparent;border:none;font-size:13.5px;font-weight:700;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--text);padding:4px 0}
+  .chapter-h input:focus{box-shadow:none;border-bottom:1px solid var(--accent)}
+  .chapnum{font-size:11px;font-weight:800;color:var(--accent);background:rgba(255,107,44,.13);
+    border-radius:6px;padding:3px 7px;letter-spacing:.06em}
+  .scene{padding:14px;border-bottom:1px dashed var(--edge);position:relative}
+  .scene:last-child{border-bottom:none}
+  .scene-t{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+  .scene-type{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--edge2);
+    color:var(--cool);background:rgba(59,201,245,.08);text-transform:uppercase;letter-spacing:.1em}
+  .scene-time{font-size:11.5px;color:var(--faint);margin-left:auto}
+  .scene .field{margin-bottom:11px}
+  .scene .field:last-child{margin-bottom:0}
+  .say{font-size:15px;line-height:1.65}
+  .say-deva{font-family:'NotoDeva','Noto Sans Devanagari','Nirmala UI',system-ui,sans-serif}
+  .en{font-size:13.5px}
+  .micro{font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;
+    display:block;margin-bottom:5px;font-weight:600}
+  .micro .req{color:var(--accent)}
+  .actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+  /* ---------- preview panel ---------- */
+  .sticky{position:sticky;top:78px;display:flex;flex-direction:column;gap:22px}
+  .est{display:flex;align-items:baseline;gap:12px;margin-bottom:4px}
+  .est .big{font-size:44px;font-weight:800;letter-spacing:-2px;line-height:1}
+  .est .unit{font-size:14px;color:var(--dim)}
+  .bar{height:8px;border-radius:99px;background:var(--panel2);overflow:hidden;margin:12px 0 8px;
+    position:relative;display:flex}
+  .bar span{display:block;height:100%;transition:width .3s}
+  .barnote{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .barnote.bad{color:var(--warn)}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
+  .stat{background:var(--bg);border:1px solid var(--edge);border-radius:10px;padding:11px 12px}
+  .stat .v{font-size:19px;font-weight:700;letter-spacing:-.5px}
+  .stat .k{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+  /* ---------- video ---------- */
+  video{width:100%;border-radius:10px;background:#000;display:block;border:1px solid var(--edge)}
+  .empty{padding:46px 22px;text-align:center;color:var(--faint);border:1px dashed var(--edge2);
+    border-radius:10px;font-size:13.5px;line-height:1.7}
+  .log{background:#07090d;border:1px solid var(--edge);border-radius:10px;padding:12px;
+    font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.65;
+    max-height:210px;overflow:auto;white-space:pre-wrap;color:#9fb3c8}
+  .log .err{color:var(--bad)} .log .ok{color:var(--good)}
+  .steps{display:flex;gap:6px;margin-bottom:12px}
+  .steps div{flex:1;height:4px;border-radius:99px;background:var(--panel2);transition:background .3s}
+  .steps div.on{background:var(--accent)} .steps div.done{background:var(--good)}
+  .steplabel{font-size:12px;color:var(--dim);margin-bottom:12px;display:flex;justify-content:space-between}
+  .aud{width:100%;margin-top:12px;height:38px}
+  /* ---------- toast ---------- */
+  #toast{position:fixed;bottom:26px;left:50%;transform:translate(-50%,90px);z-index:99;
+    background:var(--panel2);border:1px solid var(--edge2);border-radius:10px;padding:12px 20px;
+    font-size:13.5px;box-shadow:var(--sh);opacity:0;transition:.25s;pointer-events:none}
+  #toast.show{transform:translate(-50%,0);opacity:1}
+  #toast.ok{border-color:rgba(74,222,128,.4)} #toast.bad{border-color:rgba(248,113,113,.4)}
+  .skeleton{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <div class="logo"><div class="dot">▶</div> kathareel <span class="tag">studio</span></div>
+    <div class="spacer"></div>
+    <span class="pill" id="envpill">checking…</span>
+    <span class="pill" id="voicepill">voice: edge · Madhur</span>
+  </div>
+</header>
+
+<main>
+  <!-- ============ LEFT: script ============ -->
+  <section class="card">
+    <div class="card-h">
+      <h2>1 · Script</h2>
+      <div class="spacer"></div>
+      <button class="sm ghost" id="btnEstimate">Recalculate</button>
+    </div>
+    <div class="card-b">
+
+      <!-- generator -->
+      <div class="row3" style="margin-bottom:12px">
+        <div>
+          <label class="f">Topic</label>
+          <input id="topic" placeholder="Photosynthesis, Git rebase, RAG…" />
+        </div>
+        <div>
+          <label class="f">Minutes</label>
+          <input id="minutes" type="number" min="0.5" max="15" step="0.5" value="3" />
+        </div>
+        <div>
+          <label class="f">Title (English)</label>
+          <input id="newTitle" placeholder="auto from topic" />
+        </div>
+      </div>
+      <button class="primary" id="btnGenerate">Generate script</button>
+      <div class="hint">Ek outline banega — phir tum har line edit kar sakte ho. Video tab banegi jab tum bologe.</div>
+
+      <hr style="border:none;border-top:1px solid var(--edge);margin:22px 0" />
+
+      <!-- meta -->
+      <div class="row">
+        <div class="field">
+          <label class="f">Video title (opening card)</label>
+          <input id="vTitle" />
+        </div>
+        <div class="field">
+          <label class="f">Tagline (English)</label>
+          <input id="vTagline" />
+        </div>
+      </div>
+
+      <div id="scriptList"></div>
+      <button class="ghost sm" id="btnAddChapter">+ Add part</button>
+      <button class="sm primary" id="btnSave" style="float:right">Save script</button>
+      <div style="clear:both"></div>
+    </div>
+  </section>
+
+  <!-- ============ RIGHT: preview + build ============ -->
+  <div class="sticky">
+
+    <!-- estimate -->
+    <section class="card">
+      <div class="card-h"><h2>2 · Length</h2></div>
+      <div class="card-b">
+        <div class="est"><span class="big" id="estBig">0:00</span><span class="unit" id="estUnit"></span></div>
+        <div class="bar" id="estBar"><span id="estTargetBar" style="background:var(--edge2);width:0"></span><span id="estRealBar" style="background:linear-gradient(90deg,var(--accent),var(--accent-s));width:0"></span></div>
+        <div class="barnote" id="estNote">script load ho rahi hai…</div>
+        <div class="stats">
+          <div class="stat"><div class="v" id="stParts">0</div><div class="k">Parts</div></div>
+          <div class="stat"><div class="v" id="stScenes">0</div><div class="k">Scenes</div></div>
+          <div class="stat"><div class="v" id="stWords">0</div><div class="k">Words</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- build -->
+    <section class="card">
+      <div class="card-h"><h2>3 · Generate video</h2><div class="spacer"></div>
+        <span class="pill" id="buildPill" style="display:none"></span></div>
+      <div class="card-b">
+        <div class="row" style="margin-bottom:14px">
+          <div>
+            <label class="f">Voice</label>
+            <select id="voice">
+              <option value="hi-IN-MadhurNeural">Madhur — male (recommended)</option>
+              <option value="hi-IN-SwaraNeural">Swara — female</option>
+            </select>
+          </div>
+          <div>
+            <label class="f">Speed</label>
+            <select id="rate">
+              <option value="-5%">Slow (-5%) — teaching</option>
+              <option value="+0%">Normal</option>
+              <option value="-10%">Slower (-10%)</option>
+            </select>
+          </div>
+        </div>
+        <button class="primary" id="btnBuild" style="width:100%">🎬 Generate video</button>
+        <div class="hint">Hindi voice + render. 3 min video ≈ 3–4 min (CPU). Pehli baar npm install hoga.</div>
+
+        <div id="progressWrap" style="display:none;margin-top:18px">
+          <div class="steps"><div id="p1"></div><div id="p2"></div><div id="p3"></div></div>
+          <div class="steplabel"><span id="stepName">starting…</span><span id="elapsed">0s</span></div>
+          <div class="log" id="log"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- video -->
+    <section class="card">
+      <div class="card-h"><h2>4 · Result</h2><div class="spacer"></div>
+        <a id="dl" class="pill" style="display:none" download>⬇ download mp4</a></div>
+      <div class="card-b" id="videoBox">
+        <div class="empty">abhi koi video nahi — script save karo phir “Generate video” dabao</div>
+      </div>
+      <div class="card-b" id="audioBox" style="display:none;padding-top:0">
+        <label class="f">Voiceover (voice check)</label>
+        <audio class="aud" id="audioEl" controls></audio>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+/* Kaggle / Colab proxy ke peeche app /proxy/8000/ par rehta hai:
+   sab URL usi base se banao, warna /api/... root par chala jayega. */
+const BASE = (location.pathname.match(/^(.*\/proxy\/\d+)/) || [''])[1]
+          || location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+const api = (p) => BASE + p;
+const TYPES = ['hook','concept','steps','compare','number','recap'];
+let CONTENT = {slug:'video', title:'', tagline:'', chapters:[]};
+let TARGET_MIN = 3;
+
+function toast(msg, kind='') {
+  const t = $('toast'); t.textContent = msg; t.className = 'show ' + kind;
+  clearTimeout(t._h); t._h = setTimeout(()=>t.className='', 2600);
+}
+const esc = (s='') => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+/* ---------------- estimate (mirrors scripts/content_io.py) ---------------- */
+const WORDS_PER_SEC = 2.6, LEAD = 3.5, PAD = 0.9, GAP = 0.4, OUTRO = 3.7;
+function estimate() {
+  let t = LEAD + OUTRO, words = 0, scenes = 0;
+  CONTENT.chapters.forEach(ch => ch.scenes.forEach(sc => {
+    scenes++;
+    const w = (sc.say||'').trim().split(/\s+/).filter(Boolean).length;
+    words += w;
+    t += Math.max(1.6, w / WORDS_PER_SEC) + PAD + GAP;
+  }));
+  return {t, words, scenes};
+}
+const mmss = (s) => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+
+function renderEstimate() {
+  const {t, words, scenes} = estimate();
+  $('estBig').textContent = mmss(t);
+  $('stParts').textContent = CONTENT.chapters.length;
+  $('stScenes').textContent = scenes;
+  $('stWords').textContent = words;
+  const target = TARGET_MIN * 60;
+  const max = Math.max(t, target, 1);
+  $('estRealBar').style.width = (t/max*100) + '%';
+  $('estTargetBar').style.width = (target/max*100) + '%';
+  const diff = t - target;
+  const note = $('estNote');
+  note.className = 'barnote';
+  if (Math.abs(diff) <= 8) {
+    note.innerHTML = `Target <b>${TARGET_MIN} min</b> par hai. Length theek hai ✓`;
+  } else if (diff > 0) {
+    const w = Math.round(diff * WORDS_PER_SEC);
+    note.className = 'barnote bad';
+    note.innerHTML = `Target se <b>${Math.round(diff)}s zyada</b> — ~${Math.abs(w)} words hatao ya minutes badhao.`;
+  } else {
+    const w = Math.round(-diff * WORDS_PER_SEC);
+    note.className = 'barnote bad';
+    note.innerHTML = `Target se <b>${Math.round(-diff)}s kam</b> — ~${w} words add karo.`;
+  }
+}
+
+/* ---------------- render script editor ---------------- */
+function sceneHTML(sc, ci, si) {
+  const secs = Math.max(1.6, (sc.say||'').split(/\s+/).filter(Boolean).length / WORDS_PER_SEC);
+  const typeOpts = TYPES.map(t => `<option value="${t}" ${sc.type===t?'selected':''}>${t}</option>`).join('');
+  const bullets = (sc.bullets||[]).join(' | ');
+  const steps = (sc.steps||[]).map(s=>s.label + (s.note? ' :: '+s.note : '')).join(' | ');
+  const compare = (sc.left||sc.right) ? true : false;
+  return `
+  <div class="scene" data-c="${ci}" data-s="${si}">
+    <div class="scene-t">
+      <span class="chapter chapnum">${sc.id}</span>
+      <select class="scene-type-sel" data-c="${ci}" data-s="${si}" style="width:auto;padding:3px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;background:rgba(59,201,245,.08);color:var(--cool);border-color:var(--edge2)">${typeOpts}</select>
+      <span class="scene-time">~${Math.round(secs)}s</span>
+      <button class="sm danger" data-del data-c="${ci}" data-s="${si}">✕</button>
+    </div>
+
+    <div class="field">
+      <span class="micro">Narration — Hindi (Devanagari) <span class="req">required</span></span>
+      <textarea class="say say-deva" rows="2" data-f="say" data-c="${ci}" data-s="${si}">${esc(sc.say)}</textarea>
+    </div>
+    <div class="row">
+      <div class="field">
+        <span class="micro">Caption — English (screen)</span>
+        <input class="en" data-f="subtitle" data-c="${ci}" data-s="${si}" value="${esc(sc.subtitle)}" />
+      </div>
+      <div class="field">
+        <span class="micro">Keyword — English (big word)</span>
+        <input class="en" data-f="keyword" data-c="${ci}" data-s="${si}" value="${esc(sc.keyword||'')}" />
+      </div>
+    </div>
+    <div class="field">
+      <span class="micro">Bullets — English, “|” se alag</span>
+      <input class="en" data-f="bullets" data-c="${ci}" data-s="${si}" value="${esc(bullets)}" placeholder="No document | No source" />
+    </div>
+    ${(sc.type==='steps') ? `<div class="field">
+      <span class="micro">Steps — “LABEL :: note”, “|” se alag</span>
+      <input class="en" data-f="steps" data-c="${ci}" data-s="${si}" value="${esc(steps)}" placeholder="CHUNK :: split | EMBED :: number" />
+    </div>` : ''}
+    ${(sc.type==='number') ? `<div class="row3">
+      <div class="field"><span class="micro">Value</span><input class="en" data-f="value" data-c="${ci}" data-s="${si}" value="${esc(sc.value||'')}" /></div>
+      <div class="field"><span class="micro">Unit</span><input class="en" data-f="unit" data-c="${ci}" data-s="${si}" value="${esc(sc.unit||'')}" /></div>
+      <div class="field"><span class="micro">Caption</span><input class="en" data-f="caption" data-c="${ci}" data-s="${si}" value="${esc(sc.caption||'')}" /></div>
+    </div>` : ''}
+    ${(sc.type==='compare') ? `<div class="row">
+      <div class="field"><span class="micro">Left label :: points</span><input class="en" data-f="left" data-c="${ci}" data-s="${si}" value="${esc((sc.left?.label||'') + ((sc.left?.points||[]).length? ' :: '+sc.left.points.join(' | '):''))}" /></div>
+      <div class="field"><span class="micro">Right label :: points</span><input class="en" data-f="right" data-c="${ci}" data-s="${si}" value="${esc((sc.right?.label||'') + ((sc.right?.points||[]).length? ' :: '+sc.right.points.join(' | '):''))}" /></div>
+    </div>` : ''}
+  </div>`;
+}
+
+function renderScript() {
+  const box = $('scriptList');
+  if (!CONTENT.chapters.length) {
+    box.innerHTML = `<div class="empty">Koi script nahi. Upar topic daal kar “Generate script” dabao.</div>`;
+    renderEstimate(); return;
+  }
+  box.innerHTML = CONTENT.chapters.map((ch, ci) => `
+    <div class="chapter">
+      <div class="chapter-h">
+        <span class="chapnum">PART ${ci+1}</span>
+        <input data-ch="${ci}" value="${esc(ch.title)}" />
+        <button class="sm ghost" data-addscene="${ci}">+ scene</button>
+        <button class="sm danger" data-delch="${ci}">✕</button>
+      </div>
+      ${ch.scenes.map((sc, si) => sceneHTML(sc, ci, si)).join('')}
+    </div>`).join('');
+  $('vTitle').value = CONTENT.title || '';
+  $('vTagline').value = CONTENT.tagline || '';
+  renderEstimate();
+}
+
+/* ---------------- events ---------------- */
+document.addEventListener('input', (e) => {
+  const t = e.target;
+  if (t.dataset.f) {
+    const ci = +t.dataset.c, si = +t.dataset.s, f = t.dataset.f;
+    const sc = CONTENT.chapters[ci].scenes[si];
+    if (f === 'bullets') sc.bullets = t.value.split('|').map(x=>x.trim()).filter(Boolean);
+    else if (f === 'steps') sc.steps = t.value.split('|').map(x=>x.trim()).filter(Boolean)
+        .map(x => { const [l, n] = x.split('::').map(y=>(y||'').trim()); return {label:l, note:n||''}; });
+    else if (f === 'left' || f === 'right') {
+      const [lab, pts] = t.value.split('::');
+      sc[f] = {label:(lab||'').trim(), points:(pts||'').split('|').map(x=>x.trim()).filter(Boolean)};
+    }
+    else sc[f] = t.value;
+    if (f === 'say') {
+      const el = t.closest('.scene').querySelector('.scene-time');
+      const w = t.value.trim().split(/\s+/).filter(Boolean).length;
+      el.textContent = '~' + Math.round(Math.max(1.6, w/WORDS_PER_SEC)) + 's';
+    }
+    renderEstimate();
+  }
+  if (t.dataset.ch !== undefined) { CONTENT.chapters[+t.dataset.ch].title = t.value; }
+});
+
+document.addEventListener('change', (e) => {
+  const t = e.target;
+  if (t.classList.contains('scene-type-sel')) {
+    const ci=+t.dataset.c, si=+t.dataset.s;
+    CONTENT.chapters[ci].scenes[si].type = t.value;
+    renderScript();
+  }
+});
+
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.del !== undefined) {
+    const ci=+t.dataset.c, si=+t.dataset.s;
+    CONTENT.chapters[ci].scenes.splice(si,1);
+    if (!CONTENT.chapters[ci].scenes.length) CONTENT.chapters.splice(ci,1);
+    renderScript();
+  }
+  if (t.dataset.delch !== undefined) { CONTENT.chapters.splice(+t.dataset.delch,1); renderScript(); }
+  if (t.dataset.addscene !== undefined) {
+    const ci = +t.dataset.addscene;
+    const n = CONTENT.chapters.reduce((a,c)=>a+c.scenes.length,0)+1;
+    CONTENT.chapters[ci].scenes.push({
+      id:'s'+n, type:'concept', say:'', subtitle:'', keyword:'',
+      bullets:[], steps:[], left:null, right:null, value:'', unit:'', caption:''
+    });
+    renderScript();
+  }
+});
+
+$('btnAddChapter').onclick = () => {
+  const n = CONTENT.chapters.reduce((a,c)=>a+c.scenes.length,0)+1;
+  CONTENT.chapters.push({title:'Part '+(CONTENT.chapters.length+1), scenes:[{
+    id:'s'+n, type:'concept', say:'', subtitle:'', keyword:'',
+    bullets:[], steps:[], left:null, right:null, value:'', unit:'', caption:''
+  }]});
+  renderScript();
+};
+
+$('btnGenerate').onclick = async () => {
+  const topic = $('topic').value.trim();
+  if (!topic) return toast('Pehle topic likho', 'bad');
+  TARGET_MIN = +$('minutes').value || 3;
+  const btn = $('btnGenerate'); btn.disabled = true; btn.textContent = 'Generating…';
+  try {
+    const r = await fetch(api('/api/generate-script'), {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({topic, minutes: TARGET_MIN, title: $('newTitle').value.trim() || null})
+    });
+    CONTENT = await r.json();
+    renderScript();
+    toast('Script bani — ab har line edit kar sakte ho', 'ok');
+  } catch(err) { toast('Generate fail: '+err, 'bad'); }
+  btn.disabled = false; btn.textContent = 'Generate script';
+};
+
+$('btnSave').onclick = async () => {
+  CONTENT.title = $('vTitle').value;
+  CONTENT.tagline = $('vTagline').value;
+  const btn = $('btnSave'); btn.disabled = true; btn.textContent = 'Saving…';
+  try {
+    await fetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(CONTENT)});
+    toast('Script save ho gayi', 'ok');
+  } catch(err) { toast('Save fail: '+err, 'bad'); }
+  btn.disabled = false; btn.textContent = 'Save script';
+};
+
+$('btnEstimate').onclick = renderEstimate;
+
+/* ---------------- build ---------------- */
+let pollTimer = null;
+const STEP_MAP = {checking:1, hindi:2, rendering:3, done:3, failed:0, '':0};
+function setStep(label) {
+  const l = (label||'').toLowerCase();
+  let active = 0;
+  if (l.includes('check')) active = 1;
+  else if (l.includes('voice')) active = 2;
+  else if (l.includes('render')) active = 3;
+  else if (l.includes('done')) active = 4;
+  for (let i=1;i<=3;i++) {
+    const el = $('p'+i);
+    el.className = i < active ? 'done' : (i === active ? 'on' : '');
+  }
+  $('stepName').textContent = label || 'starting…';
+}
+
+$('btnBuild').onclick = async () => {
+  CONTENT.title = $('vTitle').value;
+  CONTENT.tagline = $('vTagline').value;
+  await fetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(CONTENT)});
+
+  $('btnBuild').disabled = true;
+  $('progressWrap').style.display = 'block';
+  $('log').textContent = '';
+  const r = await fetch(api('/api/build'), {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({engine:'edge', voice:$('voice').value, rate:$('rate').value})});
+  if (r.status === 409) { toast('Build already chal raha hai', 'bad'); $('btnBuild').disabled=false; return; }
+  const t0 = Date.now();
+  pollTimer = setInterval(async () => {
+    const s = await (await fetch(api('/api/status'))).json();
+    $('elapsed').textContent = Math.round((Date.now()-t0)/1000) + 's';
+    setStep(s.step);
+    $('log').textContent = s.lines.join('\n');
+    $('log').scrollTop = $('log').scrollHeight;
+    const pill = $('buildPill'); pill.style.display='inline-block';
+    if (s.running) { pill.className='pill'; pill.textContent='running…'; }
+    else if (s.ok === true) { pill.className='pill ok'; pill.textContent='done ✓'; }
+    else if (s.ok === false) { pill.className='pill bad'; pill.textContent='failed'; }
+
+    if (!s.running && s.ok !== null) {
+      clearInterval(pollTimer); $('btnBuild').disabled = false;
+      if (s.ok) { loadVideo(s.video_mtime); toast('Video ready!', 'ok'); }
+      else toast('Build fail — log dekho', 'bad');
+    } else if (s.has_video) {
+      // video already exists while running: show previous
+    }
+  }, 1500);
+};
+
+function loadVideo(mtime) {
+  const box = $('videoBox');
+  box.innerHTML = `<video id="vid" controls playsinline preload="metadata" src="${api('/video?t=')}${mtime}"></video>`;
+  $('dl').style.display = 'inline-block';
+  $('audioBox').style.display = 'block';
+  $('audioEl').src = api('/audio?t=') + mtime;
+}
+
+(async function init() {
+  try {
+    const h = await (await fetch(api('/api/health'))).json();
+    $('envpill').textContent = `node ${h.node?'✓':'✗'} · ffmpeg ${h.ffmpeg?'✓':'✗'}`;
+    $('envpill').className = 'pill ' + (h.node && h.ffmpeg ? 'ok':'bad');
+  } catch { $('envpill').textContent='offline'; $('envpill').className='pill bad'; }
+
+  const c = await (await fetch(api('/api/content'))).json();
+  CONTENT = c; renderScript();
+  if (c.estimate) TARGET_MIN = Math.max(0.5, Math.round(c.estimate/60));
+
+  const s = await (await fetch(api('/api/status'))).json();
+  if (s.has_video) loadVideo(s.video_mtime);
+})();
+</script>
+</body>
+</html>

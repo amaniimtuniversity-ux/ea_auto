@@ -1,8 +1,18 @@
+# deps & builds
 node_modules/
 out/
-audio/
+build/
+.cache/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# generated media (voice + piper models)
 voice_cache/
-*.mp3
-*.wav
-!public/voice/*.wav
+public/voice/
+*.mp4
+
+# os
 .DS_Store
