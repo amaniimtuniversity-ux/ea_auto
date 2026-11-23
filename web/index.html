@@ -311,6 +311,48 @@ function estimate() {
   }));
   return {t, words, scenes};
 }
+/* ---- offline fallback: server na chale to bhi UI kaam kare ---- */
+const ARC = ['concept','steps','number','compare','concept','steps'];
+function localSkeleton(topic, minutes, title) {
+  const t = (title || topic || 'New Video');
+  const target = Math.max(30, minutes * 60);
+  const beats = Math.max(4, Math.min(40, Math.round(target / 14.2)));
+  const parts = Math.max(2, Math.min(7, Math.round(beats / 4)));
+  const tips = {
+    hook: 'देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, aur ye topic usse kaise solve karta hai.',
+    concept: 'अब मुख्य बात। Yahan likho ki ' + t + ' asal me hai kya — ek aasan example ke saath, bina jargon ke.',
+    steps: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao.',
+    number: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log.',
+    compare: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho.',
+    recap: 'Bas itna yaad rakho. Teen baatein, aur kaam khatam.'
+  };
+  const sub = {hook:'The problem',concept:t,steps:'Step by step',number:'One number',compare:'The difference',recap:'Quick recap'};
+  const kw  = {hook:'Problem',concept:t,steps:'How it works',number:'By the numbers',compare:'Compare',recap:'Remember'};
+  const types = ['hook'].concat(Array.from({length: Math.max(0, beats-2)}, (_, i) => ARC[i % ARC.length]), ['recap']);
+  const chapters = [];
+  let made = 0;
+  const perPart = Array.from({length: parts}, (_, i) => Math.max(1, Math.floor(beats/parts) + (i < beats % parts ? 1 : 0)));
+  for (let p = 0; p < parts; p++) {
+    const ch = {title: 'Part ' + (p+1), scenes: []};
+    for (let k = 0; k < perPart[p] && made < beats; k++) {
+      const ty = types[made]; made++;
+      ch.scenes.push({
+        id: 's' + made, type: ty, say: tips[ty],
+        subtitle: sub[ty], keyword: kw[ty],
+        bullets: ['first point','second point','third point'],
+        steps: ty === 'steps' ? [{label:'STEP ONE',note:'what happens'},{label:'STEP TWO',note:'what happens'},{label:'STEP THREE',note:'what happens'}] : [],
+        left: ty === 'compare' ? {label:'WITHOUT', points:['point one','point two']} : null,
+        right: ty === 'compare' ? {label:'WITH', points:['point one','point two']} : null,
+        value: ty === 'number' ? '3' : '', unit: ty === 'number' ? 'items' : '',
+        caption: ty === 'number' ? 'what the number means' : ''
+      });
+    }
+    if (ch.scenes.length) chapters.push(ch);
+  }
+  return {slug: (topic||'video').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,''),
+          title: t, tagline: 'In Hindi, step by step', chapters};
+}
+
 const mmss = (s) => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
 
 function renderEstimate() {
@@ -484,7 +526,12 @@ $('btnGenerate').onclick = async () => {
     });
     renderScript();
     toast('Script bani — ab har line edit kar sakte ho', 'ok');
-  } catch(err) { toast('Generate fail: ' + err.message, 'bad'); }
+  } catch(err) {
+    // server/proxy down — offline outline bana do, kaam rukna nahi chahiye
+    CONTENT = localSkeleton(topic, TARGET_MIN, $('newTitle').value.trim());
+    renderScript();
+    toast('Server se jawab nahi aaya — offline outline bana di. Save karke "Generate video" dabao.', 'bad');
+  }
   btn.disabled = false; btn.textContent = 'Generate script';
 };
 
@@ -496,7 +543,11 @@ $('btnSave').onclick = async () => {
     await jfetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(CONTENT)});
     toast('Script save ho gayi', 'ok');
-  } catch(err) { toast('Save fail: ' + err.message, 'bad'); }
+  } catch(err) {
+    // browser me bhi rakh lo taaki refresh par kaam na jaye
+    try { localStorage.setItem('kathareel_content', JSON.stringify(CONTENT)); } catch (_) {}
+    toast('Save nahi hua — ' + err.message + '. Browser me safe rakha hai (reload par wapas aayega).', 'bad');
+  }
   btn.disabled = false; btn.textContent = 'Save script';
 };
 
@@ -542,7 +593,12 @@ $('btnBuild').onclick = async () => {
   pollTimer = setInterval(async () => {
     let s;
     try { s = await jfetch(api('/api/status')); }
-    catch (err) { $('stepName').textContent = 'connection issue…'; return; }
+    catch (err) {
+      $('stepName').textContent = 'connection issue…';
+      $('btnBuild').disabled = false;
+      clearInterval(pollTimer);
+      return;
+    }
     $('elapsed').textContent = Math.round((Date.now()-t0)/1000) + 's';
     setStep(s.step);
     $('log').textContent = s.lines.join('\n');
@@ -591,7 +647,12 @@ function loadVideo(mtime) {
     }
   } catch { $('envpill').textContent='offline'; $('envpill').className='pill bad'; }
 
-  const c = await jfetch(api('/api/content'));
+  let c = null;
+  try { c = await jfetch(api('/api/content')); }
+  catch (_) {
+    try { c = JSON.parse(localStorage.getItem('kathareel_content') || 'null'); } catch (__) {}
+    if (!c) { c = localSkeleton('Photosynthesis', 3, 'Photosynthesis'); toast('Server offline — offline mode me khula hai.', 'bad'); }
+  }
   CONTENT = c; renderScript();
   if (c.estimate) TARGET_MIN = Math.max(0.5, Math.round(c.estimate/60));
 
