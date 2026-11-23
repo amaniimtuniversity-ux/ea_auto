@@ -20,6 +20,39 @@ topic  →  content.ts  →  Hindi voiceover  →  timeline  →  rendered MP4
 | Look | dark canvas, one accent colour per beat, big type, step-by-step walks, chapter progress bar |
 | Length | whatever your content needs (the demo is 84 s) |
 
+## Sabse aasan flow: script pehle, video baad me
+
+Tum topic + duration do — **script pehle aayega review ke liye**, video baad me.
+
+```bash
+# 1) script banao (video nahi banegi abhi)
+./scripts/make_video.sh --minutes 3
+```
+Ye `script.md` bana deta hai: chapters, har scene ki Hindi narration, English caption, keyword,
+aur estimate (kitna lamba banega). Agar target se kam/zyada hai to tool khud batata hai
+"~45 words add karo" / "~30 words hatao".
+
+```bash
+# 2) script.md me jo chahiye badlo, phir:
+./scripts/make_video.sh --build
+```
+Ye tumhare edits `src/content.ts` me daalta hai → check → Hindi voice → render. Bas.
+
+| Command | Kya karta hai |
+|---|---|
+| `./scripts/make_video.sh --minutes 3` | script.md banao + duration check (video nahi) |
+| `./scripts/make_video.sh --build` | script.md ke edits laga kar video banao |
+| `./scripts/make_video.sh --build --force` | script review skip, seedha video |
+| `python3 scripts/script_review.py --from-script` | sirf edits apply (script.md → content.ts) |
+
+Script.md me sirf ye 3 line types badalne hote hain:
+
+```
+say: देखो भाई, एक language model अपनी याद से जवाब देता है।   ← Hindi (Devanagari), yahi bola jayega
+sub: The model answers from memory                          ← English, screen par
+key: Wrong answer                                           ← English, bada word
+```
+
 ## Topic kaise do? (3 tareeke)
 
 ### 1. Sirf AI agent ko bolo (sabse aasan)

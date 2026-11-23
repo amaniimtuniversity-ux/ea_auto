@@ -17,7 +17,7 @@ export const CHAPTERS: {n: number; title: string; from: number; to: number}[] = 
 ];
 
 export const BEATS: Beat[] = [
-  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 424, say: 'देखो भाई, एक language model अपनी याद से ही जवाब देता है। याद में ना हो, तो वो confident हो कर गलत भी बोल देता है।', subtitle: 'The model answers from memory', keyword: 'Wrong answer'},
+  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 424, say: 'देखो भाई, एक language model अपनी याद से ही जवाब देता है। याद में ना हो, तो वो confident हो कर गलत भी बोल देता है।', subtitle: 'The model fills the gaps', keyword: 'Wrong answer'},
   {id: 's2', chapter: 1, type: 'concept', from: 437, to: 682, say: 'इसी gap को RAG भरता है। जवाब देने से पहले, उसको तुम्हारे document दिखा दिए जाते हैं।', subtitle: 'Show the source first', keyword: 'RAG'},
   {id: 's3', chapter: 2, type: 'steps', from: 709, to: 1153, say: 'अब pipeline देखो। पहले document छोटे chunks में टूटे जाते हैं। हर chunk का एक number बनता है। सवाल आने पर सबसे करीबी chunks उठाए जाते हैं।', subtitle: 'Chunk → Embed → Retrieve', keyword: 'Pipeline'},
   {id: 's4', chapter: 2, type: 'number', from: 1166, to: 1526, say: 'Model को पूरा document नहीं दिया जाता, सिर्फ तीन सबसे करीबी chunks दिए जाते हैं। इससे जवाब सस्ता भी रहता है, और check करना आसान भी।', subtitle: 'Only the closest chunks', keyword: 'Top 3'},

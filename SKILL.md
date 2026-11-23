@@ -16,6 +16,19 @@ description: Turn any topic into a YouTube-style teaching video with a Hindi (Hi
 2. **Board = English only.** `subtitle`, `keyword`, `bullets`, `steps[].label`, chapter `title`,
    end credit — all English. Hindi never appears on screen.
 
+## Review-first workflow (default)
+
+User topic + duration deta hai. **Pehle script, phir video.** Kabhi seedha render mat karo.
+
+1. `python3 scripts/script_review.py --minutes <N>` → `script.md` banao.
+2. User ko script dikhao (paste karo, ya file present karo) aur bolo: "ye narration hai, badalna hai to bolo".
+   Chapter names, har beat ki Hindi narration, English caption, aur estimated length — sab dikhao.
+3. User ke edits lo (script.md me ya chat me), `--from-script` se apply karo.
+4. `check_content.py` → `build_voice.py` → render.
+5. Duration target se >15% door ho to script chhota/lamba karo, speed se mat khelo.
+
+Ek command me: `./scripts/make_video.sh --minutes <N>` then `./scripts/make_video.sh --build`.
+
 ## Workflow
 
 0. **Input**: user ek topic deta hai (ya article/document). Isi se tum `src/content.ts` likhte ho —
