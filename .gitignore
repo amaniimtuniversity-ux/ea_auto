@@ -16,3 +16,4 @@ public/voice/
 
 # os
 .DS_Store
+.content_backup.ts
