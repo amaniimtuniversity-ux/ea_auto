@@ -1,11 +1,13 @@
 import React from 'react';
 import {AbsoluteFill, Audio, Sequence, staticFile, useCurrentFrame} from 'remotion';
 import {COLORS, FONT} from './theme';
-import {BEATS, CHAPTERS, FPS, TOTAL_FRAMES} from './timeline';
+import {BEATS, CHAPTERS, FPS, TOTAL_FRAMES, type Beat} from './timeline';
 import {CONTENT, BUILT_BY} from './content';
 import {Fonts} from './lib/fonts';
 import {Subtitles} from './components/Subtitle';
 import {CutFlash, Grid, ProgressBar, Signature} from './components/Chrome';
+import {Background, SceneEntrance} from './components/Backdrop';
+import {accentColor, withAlpha} from './theme';
 import {EndCard, TitleCard} from './components/Cards';
 import {
   BigWordScene,
@@ -72,16 +74,42 @@ const LayoutBody: React.FC<{s: NonNullable<ReturnType<typeof scenePropsFor>>}> =
   return null;   // fall through to type-based
 };
 
+/**
+ * Scene ka apna accent ho to `--accent-host` set karke layout ko wrap karo,
+ * warna video-level accent hi chalega.
+ */
+const WithAccent: React.FC<{accent?: string; children: React.ReactNode}> = ({accent, children}) =>
+  accent ? (
+    <AbsoluteFill
+      style={{
+        ['--accent-host' as string]: accentColor(accent),
+        ['--accent-host-soft' as string]: withAlpha(accentColor(accent), 0.4),
+      }}
+    >
+      {children}
+    </AbsoluteFill>
+  ) : (
+    <>{children}</>
+  );
+
 const DEFAULT_LAYOUT_FOR: Record<string, string> = {
   hook: 'hook', concept: 'concept', steps: 'steps',
   compare: 'compare', number: 'number', recap: 'recap',
 };
+
+const sceneTransition = (id: string): string | undefined =>
+  scenePropsFor(id)?.transition;
 
 const SceneBody: React.FC<{id: string}> = ({id}) => {
   const s = scenePropsFor(id);
   if (!s) return null;
   // `layout` set hai aur type ke default se alag hai -> wo layout use karo
   const def = DEFAULT_LAYOUT_FOR[s.type];
+  return <WithAccent accent={s.accent}>{inner(s, def)}</WithAccent>;
+};
+
+const inner = (s: ReturnType<typeof scenePropsFor>, def: string): React.ReactNode => {
+  if (!s) return null;
   if (s.layout && s.layout !== def) {
     return <LayoutBody s={s} />;
   }
@@ -104,7 +132,7 @@ const SceneBody: React.FC<{id: string}> = ({id}) => {
 };
 
 /** Small "PART n/3 · Chapter" label for the first ~1.2s of each chapter. */
-const ChapterLabel: React.FC<{chapter: number}> = ({chapter}) => {
+const ChapterLabel: React.FC<{chapter: number; accent?: string}> = ({chapter, accent}) => {
   const frame = useCurrentFrame();
   if (frame > 36) return null;
   const ch = CHAPTERS.find((c) => c.n === chapter);
@@ -127,8 +155,8 @@ const ChapterLabel: React.FC<{chapter: number}> = ({chapter}) => {
           fontFamily: FONT.latin,
           fontSize: 13,
           letterSpacing: 2.5,
-          color: COLORS.accent,
-          border: `1.5px solid ${COLORS.accent}66`,
+          color: accent ? accentColor(accent) : 'var(--accent, #FF6B2C)',
+          border: `1.5px solid ${accent ? withAlpha(accentColor(accent), 0.4) : 'var(--accent-soft, #FF6B2C66)'}`,
           borderRadius: 99,
           padding: '5px 11px',
         }}
@@ -150,22 +178,43 @@ const ChapterLabel: React.FC<{chapter: number}> = ({chapter}) => {
   );
 };
 
+/**
+ * Ek scene. Transition ka timing scene ke andar hi count hota hai (apna
+ * Sequence), warna pichhle scene ka glow/flash pehle hi dikh jata hai.
+ * Subtitle band aur chapter label transition ke saath move karte hain.
+ */
+const SceneContent: React.FC<{b: Beat}> = ({b}) => {
+  const p = scenePropsFor(b.id);
+  const inner = Math.max(1, b.to - b.from + 1);
+  return (
+    <Sequence from={1} durationInFrames={inner}>
+      <SceneEntrance kind={p?.transition} durationInFrames={inner}>
+        <AbsoluteFill>
+          <SceneBody id={b.id} />
+          <ChapterLabel chapter={b.chapter} accent={p?.accent} />
+          <Subtitles subtitle={b.subtitle} keyword={b.keyword} startFrame={-1} endFrame={inner} />
+        </AbsoluteFill>
+      </SceneEntrance>
+    </Sequence>
+  );
+};
+
 export const Explainer: React.FC = () => {
   const titleEnd = BEATS.length ? BEATS[0].from - 2 : 60;
   const endStart = TOTAL_FRAMES - 96;
 
   return (
-    <AbsoluteFill style={{background: COLORS.bg}}>
+    <AbsoluteFill
+      style={{
+        background: COLORS.bg,
+        ['--accent' as string]: accentColor(CONTENT.accent),
+        ['--accent-soft' as string]: withAlpha(accentColor(CONTENT.accent), 0.4),
+      }}
+    >
       <Fonts />
-      <Grid />
-
-      {/* soft glow behind the content so the dark canvas is not flat */}
-      <AbsoluteFill
-        style={{
-          background: `radial-gradient(900px 520px at 22% 18%, ${COLORS.accent}14, transparent 70%),
-                       radial-gradient(760px 520px at 82% 78%, ${COLORS.cool}12, transparent 70%)`,
-        }}
-      />
+      {/* default look: dotted grid. Baaki backgrounds Backdrop khud banata hai. */}
+      {(!CONTENT.background || CONTENT.background === 'glow') && <Grid />}
+      <Background style={CONTENT.background} accent={CONTENT.accent} />
 
       <Audio src={staticFile(`voice/${CONTENT.slug}.wav`)} />
 
@@ -181,11 +230,7 @@ export const Explainer: React.FC = () => {
       {/* scenes */}
       {BEATS.map((b) => (
         <Sequence key={b.id} from={b.from - 1} durationInFrames={b.to - b.from + 2}>
-          <AbsoluteFill>
-            <SceneBody id={b.id} />
-            <ChapterLabel chapter={b.chapter} />
-            <Subtitles subtitle={b.subtitle} keyword={b.keyword} startFrame={0} endFrame={b.to - b.from + 2} />
-          </AbsoluteFill>
+          <SceneContent b={b} />
         </Sequence>
       ))}
 

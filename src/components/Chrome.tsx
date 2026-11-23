@@ -23,7 +23,7 @@ export const ProgressBar: React.FC = () => {
           top: 0,
           bottom: 0,
           width: `${progress * 100}%`,
-          background: `linear-gradient(90deg, ${COLORS.accent}00, ${COLORS.accent}55)`,
+          background: `linear-gradient(90deg, transparent, var(--accent-soft, #FF6B2C55))`,
         }}
       />
       <div
@@ -33,7 +33,7 @@ export const ProgressBar: React.FC = () => {
           top: 0,
           height: 3,
           width: `${progress * 100}%`,
-          background: COLORS.accent,
+          background: 'var(--accent, #FF6B2C)',
         }}
       />
       {CHAPTERS.map((c, i) => {

@@ -27,7 +27,7 @@ export const TitleCard: React.FC<{title: string; tagline: string; meta: string}>
           fontSize: 19,
           letterSpacing: 6,
           textTransform: 'uppercase',
-          color: COLORS.accent,
+          color: 'var(--accent, #FF6B2C)',
           opacity: easeOut(frame, 6, 16),
           marginBottom: 26,
         }}
@@ -54,7 +54,7 @@ export const TitleCard: React.FC<{title: string; tagline: string; meta: string}>
           marginTop: 26,
           height: 3,
           width: `${easeOut(frame, 20, 22) * 260}px`,
-          background: COLORS.accent,
+          background: 'var(--accent, #FF6B2C)',
           borderRadius: 3,
         }}
       />
@@ -112,7 +112,7 @@ export const EndCard: React.FC<{builtBy: string}> = ({builtBy}) => {
           fontSize: 24,
           letterSpacing: 3,
           textTransform: 'uppercase',
-          color: COLORS.accent,
+          color: 'var(--accent, #FF6B2C)',
           opacity: easeOut(frame, fps * 0.7, 20),
         }}
       >
@@ -143,8 +143,8 @@ export const ChapterBump: React.FC<{title: string; index: number; count: number}
           fontFamily: FONT.latin,
           fontSize: 14,
           letterSpacing: 3,
-          color: COLORS.accent,
-          border: `1.5px solid ${COLORS.accent}66`,
+          color: 'var(--accent, #FF6B2C)',
+          border: `1.5px solid var(--accent-soft, #FF6B2C66)`,
           borderRadius: 99,
           padding: '6px 12px',
         }}

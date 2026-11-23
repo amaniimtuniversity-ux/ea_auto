@@ -132,6 +132,28 @@
   #toast.ok{border-color:rgba(74,222,128,.4)} #toast.bad{border-color:rgba(248,113,113,.4)}
   .skeleton{animation:pulse 1.4s ease-in-out infinite}
   @keyframes pulse{0%,100%{opacity:.5}50%{opacity:1}}
+
+  /* ---------- theme panel (accent + background) ---------- */
+  .theme-panel{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0 6px;
+    background:var(--bg);border:1px solid var(--edge);border-radius:12px;padding:14px 16px}
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .swatch{width:26px;height:26px;border-radius:8px;background:var(--sw);border:2px solid transparent;
+    cursor:pointer;padding:0;transition:transform .12s,border-color .12s;position:relative}
+  .swatch:hover{transform:translateY(-2px)}
+  .swatch.on{border-color:var(--text);box-shadow:0 0 0 3px rgba(255,255,255,.08)}
+  .swatch.on::after{content:'✓';position:absolute;inset:0;display:grid;place-items:center;
+    font-size:13px;font-weight:800;color:#0B0D12}
+  .bgrow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .bgchip{background:var(--panel2);border:1px solid var(--edge);color:var(--dim);
+    border-radius:8px;padding:6px 10px;font-size:11.5px;cursor:pointer;transition:.12s}
+  .bgchip:hover{color:var(--text);border-color:var(--edge2)}
+  .bgchip.on{background:rgba(255,107,44,.12);color:var(--accent-s);border-color:rgba(255,107,44,.4)}
+  /* ---------- drag to reorder ---------- */
+  .drag{cursor:grab;color:var(--faint);font-size:14px;line-height:1;padding:0 2px;user-select:none}
+  .drag:active{cursor:grabbing}
+  .scene.dragging{opacity:.4}
+  .scene.drop-before{box-shadow:0 -2px 0 0 var(--accent)}
+  .scene.drop-after{box-shadow:0 2px 0 0 var(--accent)}
 </style>
 </head>
 <body>
@@ -186,6 +208,18 @@
         <div class="field">
           <label class="f">Tagline (English)</label>
           <input id="vTagline" />
+        </div>
+      </div>
+
+      <!-- look: poori video ka accent + background (JS se bharta hai renderTheme) -->
+      <div class="theme-panel">
+        <div class="field" style="margin:0">
+          <span class="micro">Accent colour — poori video</span>
+          <div class="swatches" id="accentSwatches"></div>
+        </div>
+        <div class="field" style="margin:0">
+          <span class="micro">Background</span>
+          <div class="bgrow" id="bgRow"></div>
         </div>
       </div>
 
@@ -313,7 +347,16 @@ const LAYOUT_LABEL = {
   number:'Big number', stat:'Stat + bar',
   recap:'Recap bullets', checklist:'Checklist', takeaways:'3 takeaways'
 };
-let CONTENT = {slug:'video', title:'', tagline:'', chapters:[]};
+const ACCENTS = {
+  orange:'#FF6B2C', blue:'#3BC9F5', green:'#5BE58B', violet:'#A78BFA',
+  pink:'#F472B6', amber:'#FBBF24', red:'#FF4D5E', teal:'#2DD4BF'
+};
+const BACKGROUNDS = ['glow','grid','dots','plain','mesh'];
+const TRANSITIONS = ['fade','slide','pop','zoom','wipe'];
+const BG_LABEL = {glow:'Soft glow', grid:'Grid lines', dots:'Dotted', plain:'Plain dark', mesh:'Moving mesh'};
+const TR_LABEL = {fade:'Fade in', slide:'Slide up', pop:'Pop', zoom:'Zoom out', wipe:'Wipe'};
+
+let CONTENT = {slug:'video', title:'', tagline:'', accent:'orange', background:'glow', chapters:[]};
 let TARGET_MIN = 3;
 
 function toast(msg, kind='') {
@@ -414,10 +457,20 @@ function sceneHTML(sc, ci, si) {
   return `
   <div class="scene" data-c="${ci}" data-s="${si}">
     <div class="scene-t">
+      <span class="drag" title="drag to reorder scenes">⠿</span>
       <span class="chapter chapnum">${sc.id}</span>
       <select class="scene-type-sel" data-c="${ci}" data-s="${si}" title="content type" style="width:auto;padding:3px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;background:rgba(59,201,245,.08);color:var(--cool);border-color:var(--edge2)">${typeOpts}</select>
       <select class="scene-layout-sel" data-c="${ci}" data-s="${si}" title="screen layout" style="width:auto;padding:3px 8px;font-size:11px;background:rgba(255,107,44,.1);color:var(--accent-s);border-color:var(--edge2)">
         ${(LAYOUTS[sc.type]||['concept']).map(l=>`<option value="${l}" ${(sc.layout||sc.type)===l?'selected':''}>${LAYOUT_LABEL[l]||l}</option>`).join('')}
+      </select>
+      <select class="scene-accent-sel" data-c="${ci}" data-s="${si}" title="scene accent (inherit = video ka rang)"
+        style="width:auto;padding:3px 8px;font-size:11px;background:rgba(255,255,255,.04);color:${ACCENTS[sc.accent]||'var(--muted)'};border-color:var(--edge2)">
+        <option value="" ${!sc.accent?'selected':''}>inherit colour</option>
+        ${Object.keys(ACCENTS).map(a=>`<option value="${a}" ${sc.accent===a?'selected':''}>${a}</option>`).join('')}
+      </select>
+      <select class="scene-transition-sel" data-c="${ci}" data-s="${si}" title="entry transition"
+        style="width:auto;padding:3px 8px;font-size:11px;background:rgba(255,255,255,.04);color:var(--muted);border-color:var(--edge2)">
+        ${TRANSITIONS.map(tr=>`<option value="${tr}" ${(sc.transition||'fade')===tr?'selected':''}>${TR_LABEL[tr]}</option>`).join('')}
       </select>
       <span class="scene-time">~${Math.round(secs)}s</span>
       ${(!(sc.say||'').trim() || !/[\u0900-\u097F]/.test(sc.say||'')) ?
@@ -464,7 +517,7 @@ function sceneHTML(sc, ci, si) {
    Khali scene banane par check_content fail hota hai — isliye sample text. */
 function blankScene(id) {
   return {
-    id: id, type: 'concept', layout: 'concept',
+    id: id, type: 'concept', layout: 'concept', transition: 'fade',
     say: 'यहाँ अपनी बात लिखो — पहले problem, फिर solution, आसान example के साथ।',
     subtitle: 'Type your point here',
     keyword: 'New point',
@@ -492,6 +545,15 @@ function validateContent() {
         problems.push(`${where}: narration 35 words se lamba`);
     });
   });
+  // theme values — galat naam render todta hai
+  if (CONTENT.accent && !ACCENTS[CONTENT.accent]) problems.push(`accent '${CONTENT.accent}' valid nahi`);
+  if (CONTENT.background && !BACKGROUNDS.includes(CONTENT.background)) problems.push(`background '${CONTENT.background}' valid nahi`);
+  CONTENT.chapters.forEach(ch => ch.scenes.forEach(sc => {
+    if (sc.layout && !(LAYOUTS[sc.type] || []).includes(sc.layout))
+      problems.push(`${sc.id}: layout '${sc.layout}' is type ke liye nahi hai`);
+    if (sc.accent && !ACCENTS[sc.accent]) problems.push(`${sc.id}: accent '${sc.accent}' valid nahi`);
+    if (sc.transition && !TRANSITIONS.includes(sc.transition)) problems.push(`${sc.id}: transition '${sc.transition}' valid nahi`);
+  }));
   if (CONTENT.chapters.length < 2) problems.push('kam se kam 2 parts chahiye (progress bar ke liye)');
   if (scenes === 0) problems.push('koi scene nahi');
   return problems;
@@ -534,7 +596,7 @@ function renderScript() {
     renderEstimate(); return;
   }
   box.innerHTML = CONTENT.chapters.map((ch, ci) => `
-    <div class="chapter">
+    <div class="chapter" data-chapter="${ci}">
       <div class="chapter-h">
         <span class="chapnum">PART ${ci+1}</span>
         <input data-ch="${ci}" value="${esc(ch.title)}" />
@@ -545,6 +607,7 @@ function renderScript() {
     </div>`).join('');
   $('vTitle').value = CONTENT.title || '';
   $('vTagline').value = CONTENT.tagline || '';
+  if (typeof renderTheme === 'function') renderTheme();
   refreshProblems();
   renderEstimate();
 }
@@ -587,6 +650,161 @@ document.addEventListener('change', (e) => {
     CONTENT.chapters[ci].scenes[si].layout = t.value;
     renderScript();
   }
+  if (t.classList.contains('scene-accent-sel')) {
+    const sc = CONTENT.chapters[+t.dataset.c].scenes[+t.dataset.s];
+    if (t.value) sc.accent = t.value; else delete sc.accent;   // khali = video accent
+    renderScript();
+  }
+  if (t.classList.contains('scene-transition-sel')) {
+    CONTENT.chapters[+t.dataset.c].scenes[+t.dataset.s].transition = t.value;
+  }
+});
+
+/* ---------- theme controls ---------- */
+function renderTheme() {
+  const sw = $('accentSwatches'), bg = $('bgRow');
+  if (!sw || !bg) return;
+  sw.innerHTML = Object.entries(ACCENTS).map(([k,v]) =>
+    `<button class="swatch" data-accent="${k}" title="${k}" style="--sw:${v}"></button>`).join('');
+  bg.innerHTML = BACKGROUNDS.map(b =>
+    `<button class="bgchip" data-bg="${b}">${BG_LABEL[b]}</button>`).join('');
+  paintTheme();
+}
+
+function paintTheme() {
+  document.querySelectorAll('.swatch').forEach(el => {
+    el.classList.toggle('on', (CONTENT.accent || 'orange') === el.dataset.accent);
+  });
+  document.querySelectorAll('.bgchip').forEach(el => {
+    el.classList.toggle('on', (CONTENT.background || 'glow') === el.dataset.bg);
+  });
+  // UI ka apna accent bhi badal do, taaki preview jaisa hi lage
+  const hex = ACCENTS[CONTENT.accent || 'orange'];
+  document.documentElement.style.setProperty('--accent', hex);
+  document.documentElement.style.setProperty('--accent-s', ACCENTS[CONTENT.accent || 'orange']);
+}
+
+document.addEventListener('click', (e) => {
+  const sw = e.target.closest('.swatch');
+  if (sw) { CONTENT.accent = sw.dataset.accent; paintTheme(); return; }
+  const bg = e.target.closest('.bgchip');
+  if (bg) { CONTENT.background = bg.dataset.bg; paintTheme(); return; }
+});
+
+/* ---------- drag & drop: scene order + parts ----------
+   Pointer events use karte hain (HTML5 DnD nahi) — mouse, touch, stylus
+   sab par same chalta hai aur test karna bhi aasan hai. */
+let DRAG = null;   // {kind:'scene'|'chapter', ci, si, el}
+
+function clearDropMarks() {
+  document.querySelectorAll('.dragging,.drop-before,.drop-after')
+    .forEach(el => el.classList.remove('dragging','drop-before','drop-after'));
+}
+
+function dropTargetAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  if (!el) return null;
+  const sc = el.closest('.scene');
+  if (sc) return {kind:'scene', el: sc};
+  const ch = el.closest('.chapter');
+  if (ch) return {kind:'chapter', el: ch};
+  return null;
+}
+
+function onPointerDown(e) {
+  const handle = e.target.closest('.drag');
+  if (!handle) return;
+  const sc = handle.closest('.scene');
+  const ch = handle.closest('.chapter');
+  e.preventDefault();
+  DRAG = sc
+    ? {kind:'scene', ci:+sc.dataset.c, si:+sc.dataset.s, el: sc}
+    : {kind:'chapter', ci:+ch.dataset.chapter, el: ch};
+  DRAG.el.classList.add('dragging');
+  DRAG.x = e.clientX; DRAG.y = e.clientY;
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp, {once:true});
+  document.addEventListener('pointercancel', onPointerUp, {once:true});
+  // long list me drag karte waqt page khud scroll ho
+  DRAG.scroller = setInterval(autoScroll, 16);
+}
+
+/* Viewport ke kinare par pahunchne par page ko dhakel do */
+function autoScroll() {
+  if (!DRAG) return;
+  const margin = 110, step = 16, h = window.innerHeight;
+  if (DRAG.y > h - margin) window.scrollBy(0, step);
+  else if (DRAG.y < margin) window.scrollBy(0, -step);
+  else return;
+  // scroll ke baad highlight bhi update karo
+  const t = dropTargetAt(DRAG.x, DRAG.y);
+  clearDropMarks();
+  DRAG.el.classList.add('dragging');
+  if (t && t.kind === 'scene' && t.el !== DRAG.el) {
+    const r = t.el.getBoundingClientRect();
+    t.el.classList.add(DRAG.y < r.top + r.height/2 ? 'drop-before' : 'drop-after');
+  } else if (t && t.kind === 'chapter' && t.el !== DRAG.el) {
+    t.el.classList.add('drop-before');
+  }
+}
+
+function onPointerMove(e) {
+  if (!DRAG) return;
+  DRAG.x = e.clientX; DRAG.y = e.clientY;
+  clearDropMarks();
+  DRAG.el.classList.add('dragging');
+  const t = dropTargetAt(e.clientX, e.clientY);
+  if (!t) return;
+  if (DRAG.kind === 'scene' && t.kind === 'scene' && t.el !== DRAG.el) {
+    const r = t.el.getBoundingClientRect();
+    t.el.classList.add(e.clientY < r.top + r.height/2 ? 'drop-before' : 'drop-after');
+  } else if (DRAG.kind === 'chapter' && t.kind === 'chapter' && t.el !== DRAG.el) {
+    t.el.classList.add('drop-before');
+  }
+}
+
+function onPointerUp(e) {
+  document.removeEventListener('pointermove', onPointerMove);
+  if (!DRAG) return;
+  if (DRAG.scroller) clearInterval(DRAG.scroller);
+  const t = dropTargetAt(e.clientX, e.clientY);
+  const kind = DRAG.kind, ci = DRAG.ci, si = DRAG.si;
+
+  if (t && kind === 'scene' && t.kind === 'scene' && t.el !== DRAG.el) {
+    const tci = +t.el.dataset.c, tsi = +t.el.dataset.s;
+    const r = t.el.getBoundingClientRect();
+    let to = e.clientY < r.top + r.height/2 ? tsi : tsi + 1;
+    if (tci === ci && to > si) to--;                     // apne hi part me shift
+    const [moved] = CONTENT.chapters[ci].scenes.splice(si, 1);
+    const emptied = !CONTENT.chapters[ci].scenes.length;
+    if (emptied && CONTENT.chapters.length > 1) {
+      CONTENT.chapters.splice(ci, 1);                     // khali part hata do
+      const dest = tci - (ci < tci ? 1 : 0);
+      CONTENT.chapters[dest].scenes.splice(Math.max(0, Math.min(to, CONTENT.chapters[dest].scenes.length)), 0, moved);
+    } else {
+      CONTENT.chapters[tci].scenes.splice(Math.max(0, Math.min(to, CONTENT.chapters[tci].scenes.length)), 0, moved);
+    }
+    toast('Scene move ho gaya', 'ok');
+  } else if (t && kind === 'chapter' && t.kind === 'chapter' && t.el !== DRAG.el) {
+    const to = +t.el.dataset.chapter;
+    if (to !== ci) {
+      const [moved] = CONTENT.chapters.splice(ci, 1);
+      CONTENT.chapters.splice(to, 0, moved);
+      toast('Part move ho gaya', 'ok');
+    }
+  }
+  clearDropMarks();
+  DRAG = null;
+  renderScript();
+}
+
+document.addEventListener('pointerdown', onPointerDown);
+
+
+document.addEventListener('dragend', () => {
+  document.querySelectorAll('.dragging,.drop-before,.drop-after')
+    .forEach(el => el.classList.remove('dragging','drop-before','drop-after'));
+  DRAG = null;
 });
 
 document.addEventListener('click', (e) => {

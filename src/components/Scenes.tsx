@@ -1,6 +1,6 @@
 import React from 'react';
 import {AbsoluteFill, useCurrentFrame, useVideoConfig} from 'remotion';
-import {COLORS, FONT, SAFE, SUBTITLE} from '../theme';
+import {COLORS, FONT, SAFE, SUBTITLE, accentColor} from '../theme';
 import {easeInOut, easeOut, pop, rise, stagger} from '../lib/anim';
 
 /**
@@ -9,12 +9,26 @@ import {easeInOut, easeOut, pop, rise, stagger} from '../lib/anim';
  * Every scene gets its content from content.ts — nothing is hard-coded per topic.
  */
 
-type Common = {keyword?: string; bullets?: string[]};
+type Common = {keyword?: string; bullets?: string[]; accent?: string};
 
-/** Content area: between the top chrome and the subtitle band, vertically centred. */
-const Stage: React.FC<{children: React.ReactNode; style?: React.CSSProperties}> = ({children, style}) => (
+/** Scene ka accent, warna video ka accent (--accent-host Video.tsx se), warna default. */
+const accent = (): string => 'var(--accent-host, var(--accent, #FF6B2C))';
+
+/** Wahi accent, 40% opacity me — borders/glows ke liye. */
+const accentSoft = (): string =>
+  'var(--accent-host-soft, var(--accent-soft, #FF6B2C66))';
+
+/**
+ * Content area: between the top chrome and the subtitle band.
+ * `accent` scene ka apna colour set karta hai (CSS variable), warna video ka.
+ * Isliye accent() ki jagah scenes var(--accent-host, ...) use karte hain.
+ */
+const Stage: React.FC<{children: React.ReactNode; style?: React.CSSProperties; accent?: string}> = ({
+  children, style, accent,
+}) => (
   <AbsoluteFill
     style={{
+      ...(accent ? {['--accent-host' as string]: accentColor(accent)} : {}),
       padding: `${SAFE.top + 26}px ${SAFE.right}px ${720 - SUBTITLE.top + 24}px ${SAFE.left}px`,
       display: 'flex',
       flexDirection: 'column',
@@ -75,7 +89,7 @@ const BulletList: React.FC<{items?: string[]; start?: number; accentLast?: boole
                 width: 10,
                 height: 10,
                 borderRadius: 3,
-                background: isLast ? COLORS.accent : COLORS.cool,
+                background: isLast ? accent() : COLORS.cool,
                 flexShrink: 0,
               }}
             />
@@ -189,8 +203,8 @@ export const ConceptScene: React.FC<Common> = ({keyword, bullets}) => {
             height: 300,
             flexShrink: 0,
             borderRadius: 999,
-            border: `2px solid ${COLORS.accent}`,
-            background: `radial-gradient(circle at 50% 40%, ${COLORS.accent}22, transparent 68%)`,
+            border: `2px solid ${accent()}`,
+            background: `radial-gradient(circle at 50% 40%, ${accentSoft()}, transparent 68%)`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -222,7 +236,7 @@ export const ConceptScene: React.FC<Common> = ({keyword, bullets}) => {
                   width: 74,
                   height: 90,
                   borderRadius: 8,
-                  border: `2px solid ${i === 1 ? COLORS.accent : COLORS.panelEdge}`,
+                  border: `2px solid ${i === 1 ? accent() : COLORS.panelEdge}`,
                   background: COLORS.panel,
                   opacity: t,
                   transform: `translateX(${(1 - t) * 90}px) rotate(${(1 - t) * 14 - i * 5}deg)`,
@@ -238,7 +252,7 @@ export const ConceptScene: React.FC<Common> = ({keyword, bullets}) => {
               fontSize: 20,
               letterSpacing: 4,
               textTransform: 'uppercase',
-              color: COLORS.accent,
+              color: accent(),
               opacity: easeOut(frame, 8, 14),
               marginBottom: 16,
             }}
@@ -292,9 +306,9 @@ export const StepsScene: React.FC<Common & {steps?: {label: string; note?: strin
                   flex: 1,
                   borderRadius: 20,
                   padding: '30px 20px 26px',
-                  border: `2px solid ${on ? COLORS.accent : COLORS.panelEdge}`,
-                  background: on ? `${COLORS.accent}14` : COLORS.panel,
-                  boxShadow: on ? `0 0 60px ${COLORS.accent}33` : 'none',
+                  border: `2px solid ${on ? accent() : COLORS.panelEdge}`,
+                  background: on ? `${accentSoft()}` : COLORS.panel,
+                  boxShadow: on ? `0 0 60px ${accentSoft()}` : 'none',
                   textAlign: 'center',
                 }}
               >
@@ -304,7 +318,7 @@ export const StepsScene: React.FC<Common & {steps?: {label: string; note?: strin
                     fontSize: 15,
                     fontWeight: 700,
                     letterSpacing: 2,
-                    color: on ? COLORS.accent : seen ? COLORS.good : COLORS.textFaint,
+                    color: on ? accent() : seen ? COLORS.good : COLORS.textFaint,
                     marginBottom: 10,
                   }}
                 >
@@ -500,7 +514,7 @@ export const NumberScene: React.FC<Common & {value?: string; unit?: string; capt
                 fontFamily: FONT.latin,
                 fontSize: 40,
                 fontWeight: 600,
-                color: COLORS.accent,
+                color: accent(),
                 opacity: easeOut(frame, 20, 16),
               }}
             >
@@ -512,7 +526,7 @@ export const NumberScene: React.FC<Common & {value?: string; unit?: string; capt
               marginTop: 18,
               height: 4,
               width: `${ring * 320}px`,
-              background: COLORS.accent,
+              background: accent(),
               borderRadius: 4,
               opacity: 0.85,
             }}
@@ -595,7 +609,7 @@ export const RecapScene: React.FC<Common> = ({keyword, bullets}) => {
                   fontFamily: FONT.latin,
                   fontSize: 15,
                   letterSpacing: 2,
-                  color: COLORS.accent,
+                  color: accent(),
                   marginBottom: 12,
                 }}
               >
@@ -626,7 +640,7 @@ export const QuoteScene: React.FC<Common> = ({keyword, bullets}) => {
         <div
           style={{
             fontFamily: FONT.latin, fontSize: 150, lineHeight: 0.7, fontWeight: 800,
-            color: COLORS.accent, opacity: 0.85, transform: `translateY(${rise(frame, 6, 26, 14)}px)`,
+            color: accent(), opacity: 0.85, transform: `translateY(${rise(frame, 6, 26, 14)}px)`,
           }}
         >
           “
@@ -666,8 +680,8 @@ export const BigWordScene: React.FC<Common> = ({keyword, bullets}) => {
           <div
             key={b}
             style={{
-              fontFamily: FONT.latin, fontSize: 22, color: COLORS.accent,
-              border: `1.5px solid ${COLORS.accent}55`, borderRadius: 99,
+              fontFamily: FONT.latin, fontSize: 22, color: accent(),
+              border: `1.5px solid ${accentSoft()}`, borderRadius: 99,
               padding: '10px 20px', opacity: easeOut(frame, 24 + i * 8, 16),
             }}
           >
@@ -697,7 +711,7 @@ export const BulletsScene: React.FC<Common> = ({keyword, bullets}) => {
             transform: `translateX(${rise(frame, 12 + i * 9, 24, 26)}px)`,
           }}
         >
-          <div style={{width: 12, height: 12, borderRadius: 4, background: COLORS.accent,
+          <div style={{width: 12, height: 12, borderRadius: 4, background: accent(),
                        marginTop: 14, flexShrink: 0}} />
           <div style={{fontFamily: FONT.latin, fontSize: 32, lineHeight: 1.45, color: COLORS.textDim}}>
             {b}
@@ -730,7 +744,7 @@ export const CardsScene: React.FC<Common> = ({keyword, bullets}) => {
               transform: `translateY(${rise(frame, 10 + i * 10, 28, 20)}px)`,
             }}
           >
-            <div style={{fontFamily: FONT.mono, fontSize: 15, color: COLORS.accent,
+            <div style={{fontFamily: FONT.mono, fontSize: 15, color: accent(),
                          letterSpacing: 2, marginBottom: 10}}>
               {`0${i + 1}`}
             </div>
@@ -754,7 +768,7 @@ export const TwoColScene: React.FC<Common> = ({keyword, bullets}) => {
       {items.map((b, i) => (
         <div key={b} style={{
           fontFamily: FONT.latin, fontSize: 27, lineHeight: 1.45, color: COLORS.textDim,
-          padding: '12px 0 12px 20px', borderLeft: `3px solid ${side === 0 ? COLORS.accent : COLORS.cool}`,
+          padding: '12px 0 12px 20px', borderLeft: `3px solid ${side === 0 ? accent() : COLORS.cool}`,
           marginBottom: 8, opacity: easeOut(frame, 14 + (side * 6 + i) * 9, 18),
         }}>
           {b}
@@ -799,9 +813,9 @@ export const TimelineScene: React.FC<Common & {steps?: {label: string; note?: st
           }}>
             <div style={{
               width: 32, height: 32, borderRadius: 99, flexShrink: 0, zIndex: 1,
-              background: COLORS.bg, border: `2.5px solid ${COLORS.accent}`,
+              background: COLORS.bg, border: `2.5px solid ${accent()}`,
               display: 'grid', placeItems: 'center',
-              fontFamily: FONT.mono, fontSize: 15, color: COLORS.accent,
+              fontFamily: FONT.mono, fontSize: 15, color: accent(),
             }}>
               {i + 1}
             </div>
@@ -843,7 +857,7 @@ export const NumberedScene: React.FC<Common & {steps?: {label: string; note?: st
             transform: `translateY(${rise(frame, 10 + i * 11, 30, 24)}px)`,
           }}>
             <div style={{fontFamily: FONT.latin, fontSize: 60, fontWeight: 900,
-                         color: COLORS.accent, lineHeight: 1, marginBottom: 14}}>
+                         color: accent(), lineHeight: 1, marginBottom: 14}}>
               {i + 1}
             </div>
             <div style={{fontFamily: FONT.latin, fontSize: 24, fontWeight: 700, color: COLORS.text}}>
@@ -960,7 +974,7 @@ export const StatScene: React.FC<Common & {value?: string; unit?: string; captio
       <div style={{display: 'flex', alignItems: 'baseline', gap: 18,
                    transform: `scale(${0.94 + 0.06 * pop(frame, 4, 24)})`, transformOrigin: 'left bottom'}}>
         <div style={{fontFamily: FONT.latin, fontSize: 150, fontWeight: 900, lineHeight: 0.95,
-                     letterSpacing: -6, color: COLORS.accent}}>
+                     letterSpacing: -6, color: accent()}}>
           {value}
         </div>
         <div style={{fontFamily: FONT.latin, fontSize: 40, fontWeight: 700, color: COLORS.textDim}}>
@@ -969,7 +983,7 @@ export const StatScene: React.FC<Common & {value?: string; unit?: string; captio
       </div>
       {/* highlight bar */}
       <div style={{
-        height: 6, borderRadius: 99, background: `linear-gradient(90deg, ${COLORS.accent}, ${COLORS.cool})`,
+        height: 6, borderRadius: 99, background: `linear-gradient(90deg, ${accent()}, ${COLORS.cool})`,
         width: `${Math.min(100, 30 + (bullets?.length || 0) * 15)}%`, margin: '18px 0 22px',
         opacity: easeOut(frame, 18, 20),
       }} />
@@ -1025,7 +1039,7 @@ export const TakeawaysScene: React.FC<Common> = ({keyword, bullets}) => {
         {items.map((b, i) => (
           <div key={b} style={{
             width: 250, background: COLORS.panel, borderRadius: 20,
-            border: `1.5px solid ${i === items.length - 1 ? COLORS.accent : COLORS.panelEdge}`,
+            border: `1.5px solid ${i === items.length - 1 ? accent() : COLORS.panelEdge}`,
             padding: '24px 20px',
             opacity: easeOut(frame, 14 + i * 12, 20),
             transform: `translateY(${rise(frame, 14 + i * 12, 30, 26)}px)`,

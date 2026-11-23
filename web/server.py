@@ -38,7 +38,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse  # noqa: 
 from pydantic import BaseModel  # noqa: E402
 import uvicorn  # noqa: E402
 
-VERSION = '1.2'
+VERSION = '1.3'
 
 app = FastAPI(title='kathareel studio')
 
@@ -144,6 +144,8 @@ class ContentPayload(BaseModel):
     slug: str = 'video'
     title: str = 'New Video'
     tagline: str = 'In Hindi, step by step'
+    accent: str | None = None
+    background: str | None = None
     chapters: list = []
 
 
@@ -194,6 +196,17 @@ def save_content(payload: ContentPayload):
                 problems.append(f'{where}: narration Devanagari me likho')
             if not (sc.get('subtitle') or '').strip():
                 problems.append(f'{where}: subtitle khali hai')
+    # theme values bhi validate — galat accent/background/transition render todta hai
+    if data.get('background') and data['background'] not in content_io.BACKGROUNDS:
+        problems.append(f"background '{data['background']}' valid nahi (chuno: {', '.join(content_io.BACKGROUNDS)})")
+    if data.get('accent') and data['accent'] not in content_io.ACCENTS:
+        problems.append(f"accent '{data['accent']}' valid nahi (chuno: {', '.join(content_io.ACCENTS)})")
+    for ch in data['chapters']:
+        for sc in ch.get('scenes', []):
+            if sc.get('transition') and sc['transition'] not in content_io.TRANSITIONS:
+                problems.append(f"{sc.get('id')}: transition '{sc['transition']}' valid nahi")
+            if sc.get('accent') and sc['accent'] not in content_io.ACCENTS:
+                problems.append(f"{sc.get('id')}: accent '{sc['accent']}' valid nahi")
     if problems:
         raise HTTPException(400, 'Script me problem: ' + '; '.join(problems[:3])
                             + (f' (+{len(problems)-3} more)' if len(problems) > 3 else ''))

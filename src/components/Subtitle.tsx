@@ -61,7 +61,7 @@ export const Subtitles: React.FC<{subtitle: string; keyword?: string; startFrame
               fontWeight: 600,
               letterSpacing: 3,
               textTransform: 'uppercase',
-              color: COLORS.accent,
+              color: 'var(--accent, #FF6B2C)',
               opacity: easeOut(local, fps * 1.1, 10),
             }}
           >

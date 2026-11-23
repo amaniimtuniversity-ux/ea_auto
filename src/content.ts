@@ -26,6 +26,12 @@ export type Scene = {
   value?: string;
   unit?: string;
   caption?: string;
+  /** Screen layout — src/components/Scenes.tsx me har naam ka component hai. */
+  layout?: string;
+  /** Scene ka apna accent (video ke accent ko override karta hai). */
+  accent?: string;
+  /** Entry animation: fade | slide | pop | zoom | wipe */
+  transition?: string;
 };
 
 export type Chapter = {
@@ -37,6 +43,10 @@ export type VideoContent = {
   slug: string;
   title: string;
   tagline: string;
+  /** Poori video ka accent: orange | blue | green | violet | pink | amber | red | teal */
+  accent?: string;
+  /** Background: glow | grid | dots | plain | mesh */
+  background?: string;
   chapters: Chapter[];
 };
 
@@ -44,6 +54,8 @@ export const CONTENT: VideoContent = {
   slug: 'rag-explained',
   title: 'RAG Explained',
   tagline: 'In Hindi, step by step',
+  accent: 'orange',
+  background: 'glow',
   chapters: [
     {
       title: 'Part 1',

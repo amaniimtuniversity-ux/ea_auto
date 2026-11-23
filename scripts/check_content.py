@@ -11,6 +11,7 @@ Kya check karta hai:
   4. subtitle bahut lamba to nahi (max ~48 chars)
   5. scene type valid hai, id duplicate to nahi
   6. chapters 2-5 ke beech, har chapter me kam se kam 1 scene
+  7. theme values valid hain (accent / background / layout / transition)
 
 Exit code 0 = sab theek, 1 = kuch fix karna hai.
 """
@@ -24,6 +25,19 @@ CONTENT = os.path.join(ROOT, 'src', 'content.ts')
 DEVANAGARI = re.compile(r'[\u0900-\u097f]')
 LATIN = re.compile(r'[A-Za-z]')
 VALID_TYPES = {'hook', 'concept', 'steps', 'compare', 'number', 'recap'}
+
+# web/ aur src/ ke saath same list — warna UI me chuni cheez render par gayab ho jati hai
+ACCENTS = {'orange', 'blue', 'green', 'violet', 'pink', 'amber', 'red', 'teal'}
+BACKGROUNDS = {'glow', 'grid', 'dots', 'plain', 'mesh'}
+TRANSITIONS = {'fade', 'slide', 'pop', 'zoom', 'wipe'}
+LAYOUTS = {
+    'hook': {'hook', 'quote', 'bigword'},
+    'concept': {'concept', 'bullets', 'cards', 'two-col'},
+    'steps': {'steps', 'timeline', 'numbered'},
+    'compare': {'compare', 'versus', 'table'},
+    'number': {'number', 'stat'},
+    'recap': {'recap', 'checklist', 'takeaways'},
+}
 
 MAX_SAY_WORDS = 35
 MAX_SUBTITLE_CHARS = 48
@@ -55,7 +69,9 @@ def load():
                 return m.group(1).replace("\\'", "'") if m else ''
 
             scenes.append({'id': sm.group(1), 'type': sm.group(2), 'say': g('say'),
-                           'subtitle': g('subtitle'), 'keyword': g('keyword')})
+                           'subtitle': g('subtitle'), 'keyword': g('keyword'),
+                           'layout': g('layout'), 'accent': g('accent'),
+                           'transition': g('transition')})
         chapters.append({'title': cm.group(1), 'scenes': scenes})
     return chapters
 
@@ -64,9 +80,18 @@ def main():
     if not os.path.exists(CONTENT):
         print('content.ts nahi mila')
         return 1
+    src = open(CONTENT, encoding='utf-8').read()
     chapters = load()
     errors, warnings = [], []
     seen_ids = set()
+
+    # poore video ka theme
+    m_acc = re.search(r"^  accent:\s*'([^']*)'", src, re.M)
+    m_bg = re.search(r"^  background:\s*'([^']*)'", src, re.M)
+    if m_bg and m_bg.group(1) not in BACKGROUNDS:
+        errors.append(f"background '{m_bg.group(1)}' valid nahi (chuno: {', '.join(sorted(BACKGROUNDS))})")
+    if m_acc and m_acc.group(1) not in ACCENTS:
+        errors.append(f"accent '{m_acc.group(1)}' valid nahi (chuno: {', '.join(sorted(ACCENTS))})")
 
     for ci, ch in enumerate(chapters, start=1):
         title = ch['title']
@@ -118,7 +143,15 @@ def main():
                 if len(kw) > MAX_KEYWORD_CHARS:
                     warnings.append(f'{where} keyword {len(kw)} chars - chhota rakho')
 
-            if sc['type'] == 'steps' and 'steps:' not in open(CONTENT, encoding='utf-8').read():
+            if sc.get('layout') and sc['layout'] not in LAYOUTS.get(sc['type'], set()):
+                errors.append(f"{where} layout '{sc['layout']}' type '{sc['type']}' ke liye valid nahi "
+                              f"(chuno: {', '.join(sorted(LAYOUTS.get(sc['type'], [])))})")
+            if sc.get('accent') and sc['accent'] not in ACCENTS:
+                errors.append(f"{where} accent '{sc['accent']}' valid nahi")
+            if sc.get('transition') and sc['transition'] not in TRANSITIONS:
+                errors.append(f"{where} transition '{sc['transition']}' valid nahi")
+
+            if sc['type'] == 'steps' and 'steps:' not in src:
                 warnings.append(f'{where} type=steps hai par steps[] nahi mila')
 
     if len(chapters) < 2:

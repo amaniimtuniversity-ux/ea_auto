@@ -146,7 +146,19 @@ Preview while editing: `npx remotion studio src/index.ts`
   subtitle: 'Chunk → Embed → Retrieve', // ENGLISH, one short line
   keyword: 'Pipeline',                  // ENGLISH, big word on screen
   steps: [{label: 'CHUNK', note: 'split the docs'}, ...],
+
+  // optional — screen ka look (web UI se set hote hain)
+  layout: 'timeline',        // 18 layouts, type ke hisaab se list badalta hai
+  accent: 'blue',            // is scene ka apna rang (video ka accent override)
+  transition: 'slide',       // fade | slide | pop | zoom | wipe
 }
+```
+
+Video-level theme (top of `content.ts`):
+
+```ts
+accent: 'orange',       // orange | blue | green | violet | pink | amber | red | teal
+background: 'glow',     // glow | grid | dots | plain | mesh
 ```
 
 Two rules that make the video work:
@@ -167,6 +179,32 @@ Two rules that make the video work:
 | `compare` | two columns, red ✕ vs green ✓ | before/after, pros/cons |
 | `number` | big counted number + kept/dropped cards | stats, "top 3" |
 | `recap` | numbered cards | closing summary |
+
+### Layouts (18) — ek type, kai screen
+
+`type` batata hai **matlab**, `layout` batata hai **screen**. Isliye ek hi video me har scene
+alag dikh sakta hai — koi fixed template nahi.
+
+| type | layouts |
+|---|---|
+| `hook` | `hook` (chat card) · `quote` · `bigword` |
+| `concept` | `concept` (ring + bullets) · `bullets` · `cards` · `two-col` |
+| `steps` | `steps` · `timeline` · `numbered` |
+| `compare` | `compare` · `versus` · `table` |
+| `number` | `number` · `stat` |
+| `recap` | `recap` · `checklist` · `takeaways` |
+
+### Theme, transitions, order
+
+- **Accent** — 8 rang. Video-level chuno, aur har scene par chaho to alag (`inherit` default hai).
+- **Background** — `glow` (soft), `grid`, `dots`, `plain`, `mesh` (dheere move karta hua gradient).
+- **Transition** — per scene entry animation: `fade`, `slide`, `pop`, `zoom`, `wipe`.
+- **Order** — web studio me scene ke `⠿` handle se drag karo (mouse, touch, stylus — sab chalta hai).
+  Part bhi drag hota hai. Drag karte waqt page khud scroll hota hai.
+
+Sab kuch `web/index.html` se, aur `scripts/content_io.py` wahi values `content.ts` me likhta hai.
+Galat naam (jaise `accent: 'purple'`) teen jagah pakde jaate hain — UI validation, `POST /api/content`
+(400) aur `scripts/check_content.py` — kyunki aisi value render todti hai.
 
 ## Voiceover
 

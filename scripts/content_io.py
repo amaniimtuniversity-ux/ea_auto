@@ -32,6 +32,34 @@ DEFAULT_LAYOUT = {'hook': 'hook', 'concept': 'concept', 'steps': 'steps',
                   'compare': 'compare', 'number': 'number', 'recap': 'recap'}
 ALL_LAYOUTS = sorted({l for v in LAYOUTS.values() for l in v})
 
+# Accent colours — content.ts ke `accent` field se (per-video ya per-scene).
+ACCENTS = {
+    'orange': '#FF6B2C', 'blue': '#3BC9F5', 'green': '#5BE58B',
+    'violet': '#A78BFA', 'pink': '#F472B6', 'amber': '#FBBF24',
+    'red': '#FF4D5E', 'teal': '#2DD4BF',
+}
+# Background styles
+BACKGROUNDS = ['glow', 'grid', 'dots', 'plain', 'mesh']
+# Scene transition (entry animation)
+TRANSITIONS = ['fade', 'slide', 'pop', 'zoom', 'wipe']
+DEFAULT_TRANSITION = 'fade'
+
+
+def clean_accent(name, fallback=None):
+    """Sirf valid accent names. Galat naam render todta hai, isliye yahan filter."""
+    n = (name or '').strip().lower()
+    return n if n in ACCENTS else fallback
+
+
+def clean_background(name):
+    n = (name or '').strip().lower()
+    return n if n in BACKGROUNDS else 'glow'
+
+
+def clean_transition(name):
+    n = (name or '').strip().lower()
+    return n if n in TRANSITIONS else DEFAULT_TRANSITION
+
 # pacing — build_voice.py se match
 WORDS_PER_SEC = 2.6
 LEAD_S = 3.5
@@ -62,6 +90,8 @@ def load(path=CONTENT):
         return _unesc(m.group(1)) if m else ''
 
     data = empty_content(top('slug') or 'video', top('title'), top('tagline'))
+    data['accent'] = top('accent') or 'orange'
+    data['background'] = top('background') or 'glow'
 
     for cm in re.finditer(r"\{\s*\n\s*title:\s*'((?:[^'\\]|\\.)*)',\s*\n\s*scenes:\s*\[", src):
         start = cm.end() - 1
@@ -117,6 +147,8 @@ def load(path=CONTENT):
                 'unit': g('unit'),
                 'caption': g('caption'),
                 'layout': g('layout') or DEFAULT_LAYOUT.get(sm.group(2), 'concept'),
+                'accent': g('accent') or '',
+                'transition': g('transition') or '',
             })
         data['chapters'].append({'title': _unesc(cm.group(1)), 'scenes': scenes})
     return data
@@ -163,6 +195,12 @@ def save(data, path=CONTENT):
         '  value?: string;',
         '  unit?: string;',
         '  caption?: string;',
+        '  /** Screen layout — src/components/Scenes.tsx me har naam ka component hai. */',
+        '  layout?: string;',
+        '  /** Scene ka apna accent (video ke accent ko override karta hai). */',
+        '  accent?: string;',
+        '  /** Entry animation: fade | slide | pop | zoom | wipe */',
+        '  transition?: string;',
         '};',
         '',
         'export type Chapter = {',
@@ -174,6 +212,10 @@ def save(data, path=CONTENT):
         '  slug: string;',
         '  title: string;',
         '  tagline: string;',
+        '  /** Poori video ka accent: orange | blue | green | violet | pink | amber | red | teal */',
+        '  accent?: string;',
+        '  /** Background: glow | grid | dots | plain | mesh */',
+        '  background?: string;',
         '  chapters: Chapter[];',
         '};',
         '',
@@ -181,6 +223,8 @@ def save(data, path=CONTENT):
         f"  slug: '{_esc(slug)}',",
         f"  title: '{_esc(data.get('title', ''))}',",
         f"  tagline: '{_esc(data.get('tagline', ''))}',",
+        f"  accent: '{_esc(clean_accent(data.get('accent'), 'orange'))}',",
+        f"  background: '{_esc(clean_background(data.get('background')))}',",
         '  chapters: [',
     ]
 
@@ -198,7 +242,12 @@ def save(data, path=CONTENT):
                 lines.append(f"          keyword: '{_esc(sc['keyword'])}',")
             lay = sc.get('layout')
             if lay and lay != DEFAULT_LAYOUT.get(sc.get('type'), 'concept'):
-                lines.append(f"      layout: '{_esc(lay)}',")
+                lines.append(f"          layout: '{_esc(lay)}',")
+            acc = clean_accent(sc.get('accent'))
+            if acc:
+                lines.append(f"          accent: '{acc}',")
+            if sc.get('transition'):
+                lines.append(f"          transition: '{clean_transition(sc.get('transition'))}',")
             if sc.get('bullets'):
                 bl = ', '.join(f"'{_esc(b)}'" for b in sc['bullets'])
                 lines.append(f'          bullets: [{bl}],')
@@ -325,6 +374,7 @@ def skeleton(topic, minutes, title=None, tagline=None):
                             'number': 'By the numbers', 'compare': 'Compare',
                             'recap': 'Remember'}[t],
                 'layout': DEFAULT_LAYOUT.get(t, 'concept'),
+                'accent': '', 'transition': '',
                 'bullets': [], 'steps': [], 'left': None, 'right': None,
                 'value': '', 'unit': '', 'caption': '',
             }
@@ -343,4 +393,5 @@ def skeleton(topic, minutes, title=None, tagline=None):
         if ch['scenes']:
             chapters.append(ch)
 
-    return {'slug': slug, 'title': title, 'tagline': tagline, 'chapters': chapters}
+    return {'slug': slug, 'title': title, 'tagline': tagline,
+            'accent': 'orange', 'background': 'glow', 'chapters': chapters}

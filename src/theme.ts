@@ -54,3 +54,28 @@ export const SUBTITLE = {
   lineHeight: 1.28,
   maxWidth: 1120,
 } as const;
+
+/**
+ * Per-video / per-scene accent (by raghv).
+ * `content.ts` ka `accent` naam se aata hai — scene ke andar wala scene ke liye,
+ * warna video ka. Scenes isi se colour lete hain, hard-code nahi karte.
+ */
+export const ACCENTS = {
+  orange: '#FF6B2C', blue: '#3BC9F5', green: '#5BE58B', violet: '#A78BFA',
+  pink: '#F472B6', amber: '#FBBF24', red: '#FF4D5E', teal: '#2DD4BF',
+} as const;
+
+export type AccentName = keyof typeof ACCENTS;
+
+export const accentColor = (name?: string): string =>
+  (ACCENTS as Record<string, string>)[name || ''] || COLORS.accent;
+
+/** Accent ka halka shade (glow / borders ke liye). */
+export const withAlpha = (hex: string, alpha: number): string => {
+  const h = hex.replace('#', '');
+  const n = parseInt(h.length === 3 ? h.split('').map((c) => c + c).join('') : h, 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
+};
