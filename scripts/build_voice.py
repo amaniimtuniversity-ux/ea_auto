@@ -364,9 +364,34 @@ def main():
     y = y / peak * 0.9
     out_wav = os.path.join(PUBLIC, f"{content['slug']}.wav")
     write_wav(out_wav, y)
+    prune_stale_voice(out_wav)
     print(f'\nvoiceover: {out_wav}')
     print(f'timeline : src/timeline.ts  ({total} frames = {total / FPS:.1f}s, {len(timeline)} beats)')
     print(f'chapters : ' + ', '.join(f"{c['title']} f{c['from']}" for c in chapters))
+
+
+def prune_stale_voice(keep):
+    """Purane voiceover WAV hata do — ye ~30 MB each hote hain aur dobara
+    ban jaate hain. Workspace 128 MB par cap hai, isliye yahi sabse bada leak tha."""
+    keep = os.path.abspath(keep)
+    removed, freed = [], 0
+    for f in sorted(os.listdir(PUBLIC)):
+        if not f.endswith('.wav'):
+            continue
+        path = os.path.join(PUBLIC, f)
+        if os.path.abspath(path) == keep:
+            continue
+        try:
+            size = os.path.getsize(path)
+            os.remove(path)
+            removed.append(f'{f} ({size / 1e6:.0f} MB)')
+            freed += size
+        except OSError:
+            pass
+    if removed:
+        print(f'\nprune  : hata diye {len(removed)} purane wav — {freed / 1e6:.0f} MB free')
+        for r in removed:
+            print(f'         - {r}')
 
 
 if __name__ == '__main__':
