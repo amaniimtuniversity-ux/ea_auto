@@ -132,7 +132,15 @@ def cache_key(text, voice, rate):
 # engines
 # --------------------------------------------------------------------------
 async def edge_synth(text, voice, rate, out):
-    import edge_tts
+    try:
+        import edge_tts
+    except ImportError:
+        raise SystemExit(
+            'edge-tts installed nahi hai. Install karo:\n'
+            '    pip install -q edge-tts numpy\n'
+            'ya offline voice use karo:\n'
+            '    pip install -q piper-tts && python3 scripts/build_voice.py --engine piper'
+        )
     for attempt in range(1, 5):
         try:
             comm = edge_tts.Communicate(text, voice, rate=rate, boundary='WordBoundary')
@@ -206,7 +214,23 @@ def main():
     os.makedirs(CACHE, exist_ok=True)
     os.makedirs(PUBLIC, exist_ok=True)
 
-    import numpy as np
+    try:
+        import numpy as np
+    except ImportError:
+        raise SystemExit('numpy chahiye:  pip install -q numpy')
+    if a.engine == 'piper':
+        pass
+    # quick dependency check so the failure is a clear message, not a traceback
+    if a.engine == 'edge' and not a.check:
+        try:
+            import edge_tts  # noqa: F401
+        except ImportError:
+            raise SystemExit(
+                'edge-tts installed nahi hai. Do options:\n'
+                '  1) natural neural Hindi voice:  pip install -q edge-tts numpy\n'
+                '  2) offline voice:               pip install -q piper-tts numpy  ->  '
+                'python3 scripts/build_voice.py --engine piper'
+            )
 
     frames = int(LEAD)
     pieces = [(0.0, np.zeros(int(LEAD / FPS * SR), dtype=np.float32))]
