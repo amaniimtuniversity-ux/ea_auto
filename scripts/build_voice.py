@@ -113,15 +113,20 @@ def trim(x, thr=0.006):
 
 
 def write_wav(path, x, sr=SR):
+    """Mono, 16-bit PCM.
+
+    Pehle stereo likh rahe the (same sample dono channel me) — file size
+    double, koi faayda nahi kyunki mix mono hi hai. Mono rakhne se 3 min
+    video ka voiceover ~33 MB ki jagah ~16 MB ka rehta hai.
+    """
     import numpy as np
     a = (np.clip(x, -1, 1) * 32767).astype(np.int16)
-    stereo = np.stack([a, a], 1)
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with wave.open(path, 'wb') as w:
-        w.setnchannels(2)
+        w.setnchannels(1)
         w.setsampwidth(2)
         w.setframerate(sr)
-        w.writeframes(stereo.tobytes())
+        w.writeframes(a.tobytes())
 
 
 def cache_key(text, voice, rate):
