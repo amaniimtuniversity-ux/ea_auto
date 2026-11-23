@@ -1,0 +1,40 @@
+# kathareel — worked example: "RAG kya hai?"
+
+This is the exact narration used by the demo video (out/kathareel-demo.mp4, 84 s).
+Copy this shape when you write your own topic.
+
+## The topic, in one line
+Ek language model ko apne documents dikhana — RAG.
+
+## Chapters (English names, shown on the progress bar)
+1. Problem      — the model answers from memory and can be wrong
+2. Pipeline     — chunk → embed → retrieve
+3. Result       — answer plus its source
+
+## Narration (Devanagari + English tech words), one line per beat
+
+# Part 1 — Problem
+s1  देखो भाई, एक language model अपनी याद से ही जवाब देता है। याद में ना हो, तो वो confident हो कर गलत भी बोल देता है।
+s2  इसी gap को RAG भरता है। जवाब देने से पहले, उसको तुम्हारे document दिखा दिए जाते हैं।
+
+# Part 2 — Pipeline
+s3  अब pipeline देखो। पहले document छोटे chunks में टूटे जाते हैं। हर chunk का एक number बनता है। सवाल आने पर सबसे करीबी chunks उठाए जाते हैं।
+s4  Model को पूरा document नहीं दिया जाता, सिर्फ तीन सबसे करीबी chunks दिए जाते हैं। इससे जवाब सस्ता भी रहता है, और check करना आसान भी।
+
+# Part 3 — Result
+s5  फर्क साफ है। बिना RAG, जवाब सिर्फ याद से आता है। RAG के साथ, जवाब के साथ उसका source भी आता है। इसलिए study और research में ये ज़रूरी हो जाता है।
+s6  बस इतना याद रखो। RAG का मतलब है, model को जवाब देने से पहले सही document दिखाओ। Chunk, embed, retrieve, फिर जवाब।
+
+## English captions (on screen — one short line each)
+s1  The model answers from memory        keyword: Wrong answer
+s2  Show the source first                keyword: RAG
+s3  Chunk → Embed → Retrieve             keyword: Pipeline
+s4  Only the closest chunks              keyword: Top 3
+s5  Answer + source                      keyword: Clear difference
+s6  Chunk, embed, retrieve               keyword: Remember
+
+## Why this works as a teaching video
+- Opens with a familiar situation (a model giving a confident wrong answer), not a definition.
+- Each beat has exactly one visual: chat card, ring, step cards, number + cards, two columns, recap cards.
+- The pipeline beat is *walked* (one step highlighted every 1.6 s) instead of shown all at once.
+- Hindi carries the explanation; English carries the vocabulary the viewer will actually search for.
