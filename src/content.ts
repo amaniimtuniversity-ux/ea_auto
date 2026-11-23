@@ -1,7 +1,7 @@
 /**
  * ============================================================
  *  kathareel — content file (by raghv)
- *  Topic: BAS
+ *  Topic: Machine Learning
  * ============================================================
  *
  *  `say`      = jo bola jayega -> HINDI, DEVANAGARI me (English tech words Latin me chalenge)
@@ -42,7 +42,7 @@ export type VideoContent = {
 
 export const CONTENT: VideoContent = {
   slug: 'machine-learning',
-  title: 'BAS',
+  title: 'Machine Learning',
   tagline: 'In Hindi, step by step',
   chapters: [
     {
@@ -51,7 +51,7 @@ export const CONTENT: VideoContent = {
         {
           id: 's1',
           type: 'hook',
-          say: 'देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, aur ye topic usse kaise solve karta hai.',
+          say: 'देखो भाई, यहाँ एक आम situation है। ज़्यादातर लोग इस problem से रोज़ गुज़रते हैं, और उन्हें पता भी नहीं होता कि इसका solution इतना आसान है।',
           subtitle: 'The problem',
           keyword: 'Problem',
           bullets: ['first point', 'second point', 'third point'],
@@ -59,15 +59,15 @@ export const CONTENT: VideoContent = {
         {
           id: 's2',
           type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
+          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'Machine Learning',
+          keyword: 'Machine Learning',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
           id: 's3',
           type: 'steps',
-          say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।',
+          say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
           subtitle: 'Step by step',
           keyword: 'How it works',
           steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
@@ -75,7 +75,7 @@ export const CONTENT: VideoContent = {
         {
           id: 's4',
           type: 'number',
-          say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।',
+          say: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।',
           subtitle: 'One number',
           keyword: 'By the numbers',
           value: '3',
@@ -85,7 +85,7 @@ export const CONTENT: VideoContent = {
         {
           id: 's5',
           type: 'compare',
-          say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।',
+          say: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।',
           subtitle: 'The difference',
           keyword: 'Compare',
           left: {label: 'WITHOUT', points: ['point one', 'point two']},
@@ -99,15 +99,15 @@ export const CONTENT: VideoContent = {
         {
           id: 's6',
           type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
+          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'Machine Learning',
+          keyword: 'Machine Learning',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
           id: 's7',
           type: 'steps',
-          say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।',
+          say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
           subtitle: 'Step by step',
           keyword: 'How it works',
           steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
@@ -115,15 +115,15 @@ export const CONTENT: VideoContent = {
         {
           id: 's8',
           type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
+          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'Machine Learning',
+          keyword: 'Machine Learning',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
           id: 's9',
           type: 'steps',
-          say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।',
+          say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
           subtitle: 'Step by step',
           keyword: 'How it works',
           steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
@@ -136,7 +136,7 @@ export const CONTENT: VideoContent = {
         {
           id: 's10',
           type: 'number',
-          say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।',
+          say: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।',
           subtitle: 'One number',
           keyword: 'By the numbers',
           value: '3',
@@ -146,7 +146,7 @@ export const CONTENT: VideoContent = {
         {
           id: 's11',
           type: 'compare',
-          say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।',
+          say: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।',
           subtitle: 'The difference',
           keyword: 'Compare',
           left: {label: 'WITHOUT', points: ['point one', 'point two']},
@@ -155,92 +155,15 @@ export const CONTENT: VideoContent = {
         {
           id: 's12',
           type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
+          say: 'अब मुख्य बात समझो। Machine Learning का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
+          subtitle: 'Machine Learning',
+          keyword: 'Machine Learning',
           bullets: ['first point', 'second point', 'third point'],
         },
         {
           id: 's13',
-          type: 'steps',
-          say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।',
-          subtitle: 'Step by step',
-          keyword: 'How it works',
-          steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
-        },
-      ],
-    },
-    {
-      title: 'Part 4',
-      scenes: [
-        {
-          id: 's14',
-          type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
-          bullets: ['first point', 'second point', 'third point'],
-        },
-        {
-          id: 's15',
-          type: 'steps',
-          say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।',
-          subtitle: 'Step by step',
-          keyword: 'How it works',
-          steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
-        },
-        {
-          id: 's16',
-          type: 'number',
-          say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।',
-          subtitle: 'One number',
-          keyword: 'By the numbers',
-          value: '3',
-          unit: 'items',
-          caption: 'what the number means',
-        },
-        {
-          id: 's17',
-          type: 'compare',
-          say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।',
-          subtitle: 'The difference',
-          keyword: 'Compare',
-          left: {label: 'WITHOUT', points: ['point one', 'point two']},
-          right: {label: 'WITH', points: ['point one', 'point two']},
-        },
-      ],
-    },
-    {
-      title: 'Part 5',
-      scenes: [
-        {
-          id: 's18',
-          type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
-          bullets: ['first point', 'second point', 'third point'],
-        },
-        {
-          id: 's19',
-          type: 'steps',
-          say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।',
-          subtitle: 'Step by step',
-          keyword: 'How it works',
-          steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
-        },
-        {
-          id: 's20',
-          type: 'concept',
-          say: 'अब मुख्य बात। Yahan likho ki BAS asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।',
-          subtitle: 'BAS',
-          keyword: 'BAS',
-          bullets: ['first point', 'second point', 'third point'],
-        },
-        {
-          id: 's21',
           type: 'recap',
-          say: 'Bas itna yaad rakho. Teen baatein, aur kaam khatam. तीन बातें एक-एक line में दोहराओ। और एक छोटा homework दे दो viewer को।',
+          say: 'बस इतना याद रखो। समस्या क्या थी, हल कैसे निकला, और आगे क्या करना है। तीन बातें, और काम ख़त्म। तीन बातें एक-एक line में दोहरा लो, तो सब पक्का हो जाता है।',
           subtitle: 'Quick recap',
           keyword: 'Remember',
           bullets: ['first point', 'second point', 'third point'],

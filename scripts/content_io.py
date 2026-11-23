@@ -231,7 +231,10 @@ def _pad_say(base, fillers, per_beat_s, max_words=34, wps=WORDS_PER_SEC):
 
 def skeleton(topic, minutes, title=None, tagline=None):
     slug = re.sub(r'[^a-z0-9-]+', '-', (topic or 'video').lower()).strip('-') or 'video'
-    title = title or (topic or 'New Video')
+    # title hamesha clean: 'BAS' jaisa all-caps ya khaali na rahe
+    title = (title or topic or 'New Video').strip()
+    if title.isupper() or title.islower():
+        title = title.title()
     tagline = tagline or 'In Hindi, step by step'
 
     # target duration se beats nikalo. Har placeholder beat ~14s ka hota hai, par
@@ -249,33 +252,34 @@ def skeleton(topic, minutes, title=None, tagline=None):
     # in fillers se hint ko target duration tak lamba karte hain — poori Devanagari,
     # thoda thoda karke, taaki ek beat ki limit (~35 words) na toote.
     FILL = {
-        'hook': [' यहाँ एक छोटा real example दो — जो viewer के रोज़ के काम से जुड़ा हो।',
-                 ' फिर बोलो कि इस video के बाद वो क्या कर पाएगा।'],
-        'concept': [' यहाँ definition को अपने शब्दों में दोबारा बोलो।',
-                    ' एक आसान example से समझाओ, बिना jargon के।',
-                    ' एक common गलतफहमी भी बताओ।'],
-        'steps': [' हर step में बोलो कि input क्या जाता है।',
-                  ' और output क्या आता है, एक line में।',
-                  ' आखिर में बताओ कौन सा step सबसे ज़रूरी है।'],
-        'number': [' Number के बाद बोलो कि ये बड़ा है या छोटा।',
-                   ' और ये number कहाँ से आया, ताकि भरोसा बने।'],
-        'compare': [' दोनों तरफ़ का एक फ़ायदा बोलो।',
-                    ' और एक नुकसान भी साफ़ शब्दों में।',
-                    ' आखिर में बताओ कब कौन सा option चुनना चाहिए।'],
-        'recap': [' तीन बातें एक-एक line में दोहराओ।',
-                  ' और एक छोटा homework दे दो viewer को।'],
+        'hook': [' रोज़ की ज़िंदगी से एक छोटा उदाहरण ले लो, तो बात तुरंत समझ आ जाती है।',
+                 ' और इस video के बाद तुम यही काम खुद कर पाओगे।'],
+        'concept': [' definition को अपने शब्दों में दोहराओ, तो याद रहती है।',
+                    ' एक आसान उदाहरण से बात पक्की हो जाती है।',
+                    ' और एक आम गलतफ़हमी भी दूर हो जाती है।'],
+        'steps': [' हर step में यह भी देखो कि अंदर क्या जाता है और बाहर क्या आता है।',
+                  ' आख़िर में सबसे ज़रूरी step पहचान लो, वही सबसे ज़्यादा मायने रखता है।'],
+        'number': [' यह number बड़ा है या छोटा, यह समझना भी ज़रूरी है।',
+                   ' और यह number कहाँ से आया, यह जानने से भरोसा बनता है।'],
+        'compare': [' दोनों तरफ़ का एक फ़ायदा और एक नुकसान साफ़ शब्दों में देखो।',
+                    ' आख़िर में तय करो कि कब कौन सा तरीका चुनना चाहिए।'],
+        'recap': [' तीन बातें एक-एक line में दोहरा लो, तो सब पक्का हो जाता है।',
+                  ' और एक छोटा काम दे देता हूँ, जो तुम आज ही कर सकते हो।'],
     }
 
     say_hints = {
-        'hook': ('देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, '
-                 'aur ye topic usse kaise solve karta hai.'),
-        'concept': ('अब मुख्य बात। Yahan likho ki {t} asal me hai kya — ek aasan example ke saath, '
-                    'bina jargon ke.'),
-        'steps': ('अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me '
-                  'samjhao.'),
-        'number': 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log.',
-        'compare': 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho.',
-        'recap': 'Bas itna yaad rakho. Teen baatein, aur kaam khatam.',
+        'hook': ('देखो भाई, यहाँ एक आम situation है। ज़्यादातर लोग इस problem से रोज़ गुज़रते हैं, '
+                 'और उन्हें पता भी नहीं होता कि इसका solution इतना आसान है।'),
+        'concept': ('अब मुख्य बात समझो। {t} का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, '
+                    'और हर हिस्से को एक-एक करके सॉल्व करना।'),
+        'steps': ('अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, '
+                  'और आख़िर में model उससे सीखता है।'),
+        'number': ('अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग '
+                   'यही गलती करते हैं, और वजह बहुत छोटी है।'),
+        'compare': ('फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका '
+                    'जो तेज़ है — दोनों को साथ रखकर देखो।'),
+        'recap': ('बस इतना याद रखो। समस्या क्या थी, हल कैसे निकला, और आगे क्या करना है। '
+                  'तीन बातें, और काम ख़त्म।'),
     }
 
     # ONE teaching arc for the whole video, then split across parts:

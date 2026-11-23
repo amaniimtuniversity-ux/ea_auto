@@ -326,12 +326,12 @@ function localSkeleton(topic, minutes, title) {
   const beats = Math.max(4, Math.min(40, Math.round(target / 14.2)));
   const parts = Math.max(2, Math.min(7, Math.round(beats / 4)));
   const tips = {
-    hook: 'देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, aur ye topic usse kaise solve karta hai.',
-    concept: 'अब मुख्य बात। Yahan likho ki ' + t + ' asal me hai kya — ek aasan example ke saath, bina jargon ke.',
-    steps: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao.',
-    number: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log.',
-    compare: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho.',
-    recap: 'Bas itna yaad rakho. Teen baatein, aur kaam khatam.'
+    hook: 'देखो भाई, यहाँ एक आम situation है। ज़्यादातर लोग इस problem से रोज़ गुज़रते हैं, और उन्हें पता भी नहीं होता कि इसका solution इतना आसान है।',
+    concept: 'अब मुख्य बात समझो। ' + t + ' का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना।',
+    steps: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
+    number: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।',
+    compare: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।',
+    recap: 'बस इतना याद रखो। समस्या क्या थी, हल कैसे निकला, और आगे क्या करना है। तीन बातें, और काम ख़त्म।'
   };
   const sub = {hook:'The problem',concept:t,steps:'Step by step',number:'One number',compare:'The difference',recap:'Quick recap'};
   const kw  = {hook:'Problem',concept:t,steps:'How it works',number:'By the numbers',compare:'Compare',recap:'Remember'};
@@ -464,7 +464,8 @@ function validateContent() {
       scenes++;
       const where = sc.id || `part${ci+1}-scene${si+1}`;
       if (!(sc.say || '').trim()) problems.push(`${where}: narration khali hai`);
-      else if (!dev.test(sc.say)) problems.push(`${where}: narration Devanagari me likho`);
+      else if (!dev.test(sc.say))
+        problems.push(`${where}: narration me Hindi (Devanagari) nahi hai`);
       if (!(sc.subtitle || '').trim()) problems.push(`${where}: subtitle khali hai`);
       if ((sc.subtitle || '').length > 48) problems.push(`${where}: subtitle 48 chars se lamba`);
       if ((sc.keyword || '').length > 24) problems.push(`${where}: keyword 24 chars se lamba`);
@@ -653,11 +654,19 @@ $('btnBuild').onclick = async () => {
   CONTENT.tagline = $('vTagline').value;
   const problems = validateContent();
   if (problems.length) {
-    toast('Pehle ye theek karo: ' + problems[0] + ' (+' + (problems.length-1) + ' more)', 'bad');
+    toast(`${problems.length} cheez baaki hai — jaise "${problems[0]}". `
+        + 'Top-right 🔧 button se ek click me bhar jayega.', 'bad');
     console.warn('kathareel validation:', problems);
-    const firstId = problems[0].split(':')[0];
-    const el = document.querySelector(`.scene [data-f="say"]`);
-    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    // pehle kharab scene tak scroll karo
+    const badId = problems[0].split(':')[0].trim();
+    const scenes = [...document.querySelectorAll('.scene')];
+    const target = scenes.find(el => el.querySelector('.chapnum')?.textContent.trim() === badId)
+                || scenes[0];
+    if (target) {
+      target.scrollIntoView({behavior:'smooth', block:'center'});
+      target.style.boxShadow = '0 0 0 2px #f87171';
+      setTimeout(() => { target.style.boxShadow = ''; }, 2500);
+    }
     return;
   }
   try {
