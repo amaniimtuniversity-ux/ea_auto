@@ -180,10 +180,10 @@
     <div class="card-b">
 
       <!-- generator -->
-      <div class="row3" style="margin-bottom:12px">
+      <div class="row3" style="margin-bottom:10px">
         <div>
           <label class="f">Topic</label>
-          <input id="topic" placeholder="Photosynthesis, Git rebase, RAG…" />
+          <input id="topic" placeholder="Machine learning, Git rebase, Photosynthesis…" />
         </div>
         <div>
           <label class="f">Minutes</label>
@@ -194,6 +194,13 @@
           <input id="newTitle" placeholder="auto from topic" />
         </div>
       </div>
+
+      <div class="field" style="margin-bottom:10px">
+        <label class="f">Brief — kya kya chahiye <span class="req" style="color:var(--faint);font-weight:400;text-transform:none;letter-spacing:0">(ye video ka content decide karta hai)</span></label>
+        <textarea id="brief" rows="3" placeholder="machine learning: definition, types, supervised vs unsupervised, how it works, uses, limitations&#10;&#10;Definition sirf ek hi chahiye to bas likho: &quot;photosynthesis: definition&quot;"></textarea>
+        <div class="hint" id="briefHint">Jo likhoge wahi scene banega — definition, types, steps, compare, uses, limitations. Definition wala part screen par pop-up card me bhi aayega.</div>
+      </div>
+
       <button class="primary" id="btnGenerate">Generate script</button>
       <div class="hint">Ek outline banega — phir tum har line edit kar sakte ho. Video tab banegi jab tum bologe.</div>
 
@@ -494,6 +501,10 @@ function sceneHTML(sc, ci, si) {
       </div>
     </div>
     <div class="field">
+      <span class="micro">Definition / note — screen par pop-up card me aata hai</span>
+      <input class="en" data-f="note" data-c="${ci}" data-s="${si}" value="${esc(sc.note||'')}" placeholder="Machine learning = model + data + training" />
+    </div>
+    <div class="field">
       <span class="micro">Bullets — English, “|” se alag</span>
       <input class="en" data-f="bullets" data-c="${ci}" data-s="${si}" value="${esc(bullets)}" placeholder="No document | No source" />
     </div>
@@ -521,6 +532,7 @@ function blankScene(id) {
     say: 'यहाँ अपनी बात लिखो — पहले problem, फिर solution, आसान example के साथ।',
     subtitle: 'Type your point here',
     keyword: 'New point',
+    note: '',
     bullets: ['point one', 'point two'],
     steps: [], left: null, right: null, value: '', unit: '', caption: ''
   };
@@ -832,19 +844,23 @@ $('btnAddChapter').onclick = () => {
 
 $('btnGenerate').onclick = async () => {
   const topic = $('topic').value.trim();
-  if (!topic) return toast('Pehle topic likho', 'bad');
+  const brief = $('brief').value.trim();
+  if (!topic && !brief) return toast('Pehle topic ya brief likho', 'bad');
   TARGET_MIN = +$('minutes').value || 3;
   const btn = $('btnGenerate'); btn.disabled = true; btn.textContent = 'Generating…';
   try {
     CONTENT = await jfetch(api('/api/generate-script'), {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({topic, minutes: TARGET_MIN, title: $('newTitle').value.trim() || null})
+      body: JSON.stringify({topic, minutes: TARGET_MIN,
+        title: $('newTitle').value.trim() || null,
+        brief: $('brief').value.trim() || null})
     });
     renderScript();
     toast('Script bani — ab har line edit kar sakte ho', 'ok');
   } catch(err) {
     // server/proxy down — offline outline bana do, kaam rukna nahi chahiye
     CONTENT = localSkeleton(topic, TARGET_MIN, $('newTitle').value.trim());
+    if (brief) CONTENT.briefFallback = true;   // niche toast batata hai
     renderScript();
     toast('Server se jawab nahi aaya — offline outline bana di. Save karke "Generate video" dabao.', 'bad');
   }

@@ -7,6 +7,7 @@ import {Fonts} from './lib/fonts';
 import {Subtitles} from './components/Subtitle';
 import {CutFlash, Grid, ProgressBar, Signature} from './components/Chrome';
 import {Background, SceneEntrance} from './components/Backdrop';
+import {NoteCard} from './components/NoteCard';
 import {accentColor, withAlpha} from './theme';
 import {EndCard, TitleCard} from './components/Cards';
 import {
@@ -91,6 +92,9 @@ const WithAccent: React.FC<{accent?: string; children: React.ReactNode}> = ({acc
   ) : (
     <>{children}</>
   );
+
+/** Ye layouts poora chauda content rakhte hain — popup inke upar-baayein jaata hai. */
+const WIDE_LAYOUTS = ['versus', 'table', 'two-col', 'timeline'];
 
 const DEFAULT_LAYOUT_FOR: Record<string, string> = {
   hook: 'hook', concept: 'concept', steps: 'steps',
@@ -192,6 +196,8 @@ const SceneContent: React.FC<{b: Beat}> = ({b}) => {
         <AbsoluteFill>
           <SceneBody id={b.id} />
           <ChapterLabel chapter={b.chapter} accent={p?.accent} />
+          <NoteCard note={p?.note} durationInFrames={inner}
+                    wide={WIDE_LAYOUTS.includes(p?.layout || '')} />
           <Subtitles subtitle={b.subtitle} keyword={b.keyword} startFrame={-1} endFrame={inner} />
         </AbsoluteFill>
       </SceneEntrance>

@@ -31,7 +31,8 @@ import time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, 'scripts'))
 
-import content_io  # noqa: E402
+import content_io
+import brief_engine  # noqa: E402
 
 from fastapi import FastAPI, HTTPException  # noqa: E402
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse  # noqa: E402
@@ -150,10 +151,11 @@ class ContentPayload(BaseModel):
 
 
 class GeneratePayload(BaseModel):
-    topic: str
+    topic: str = ''
     minutes: float = 3
     title: str | None = None
     tagline: str | None = None
+    brief: str | None = None      # poora brief — isse topic-specific script banti hai
 
 
 class BuildPayload(BaseModel):
@@ -223,7 +225,14 @@ def save_content(payload: ContentPayload):
 
 @app.post('/api/generate-script')
 def generate_script(payload: GeneratePayload):
-    data = content_io.skeleton(payload.topic, payload.minutes, payload.title, payload.tagline)
+    # brief diya hai to topic-specific engine, warna purana skeleton
+    if (payload.brief or '').strip():
+        data = brief_engine.build(payload.brief, payload.minutes,
+                                  payload.title, payload.tagline,
+                                  topic=payload.topic or None)
+    else:
+        data = content_io.skeleton(payload.topic, payload.minutes,
+                                   payload.title, payload.tagline)
     content_io.save(data)
     data['estimate'] = content_io.estimate(data['chapters'])
     return data

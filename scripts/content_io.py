@@ -146,6 +146,7 @@ def load(path=CONTENT):
                 'value': g('value'),
                 'unit': g('unit'),
                 'caption': g('caption'),
+                'note': g('note'),
                 'layout': g('layout') or DEFAULT_LAYOUT.get(sm.group(2), 'concept'),
                 'accent': g('accent') or '',
                 'transition': g('transition') or '',
@@ -201,6 +202,8 @@ def save(data, path=CONTENT):
         '  accent?: string;',
         '  /** Entry animation: fade | slide | pop | zoom | wipe */',
         '  transition?: string;',
+        '  /** Definition / explanation card jo screen par popup ki tarah aata hai. */',
+        '  note?: string;',
         '};',
         '',
         'export type Chapter = {',
@@ -268,6 +271,8 @@ def save(data, path=CONTENT):
                 lines.append(f"          unit: '{_esc(sc['unit'])}',")
             if sc.get('caption'):
                 lines.append(f"          caption: '{_esc(sc['caption'])}',")
+            if sc.get('note'):
+                lines.append(f"          note: '{_esc(sc['note'])}',")
             lines.append('        },')
         lines.append('      ],')
         lines.append('    },')

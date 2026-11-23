@@ -1,7 +1,7 @@
 /**
  * ============================================================
  *  kathareel — content file (by raghv)
- *  Topic: RAG Explained
+ *  Topic: Machine learning
  * ============================================================
  *
  *  `say`      = jo bola jayega -> HINDI, DEVANAGARI me (English tech words Latin me chalenge)
@@ -32,6 +32,8 @@ export type Scene = {
   accent?: string;
   /** Entry animation: fade | slide | pop | zoom | wipe */
   transition?: string;
+  /** Definition / explanation card jo screen par popup ki tarah aata hai. */
+  note?: string;
 };
 
 export type Chapter = {
@@ -51,11 +53,11 @@ export type VideoContent = {
 };
 
 export const CONTENT: VideoContent = {
-  slug: 'rag-explained',
-  title: 'RAG Explained',
+  slug: 'machine-learning',
+  title: 'Machine learning',
   tagline: 'In Hindi, step by step',
-  accent: 'orange',
-  background: 'glow',
+  accent: 'blue',
+  background: 'mesh',
   chapters: [
     {
       title: 'Part 1',
@@ -63,45 +65,24 @@ export const CONTENT: VideoContent = {
         {
           id: 's1',
           type: 'hook',
-          say: 'देखो भाई, यहाँ एक आम situation है। ज़्यादातर लोग इस problem से रोज़ गुज़रते हैं, और उन्हें पता भी नहीं होता कि इसका solution इतना आसान है।',
-          subtitle: 'The problem',
-          keyword: 'Problem',
-          bullets: ['first point', 'second point', 'third point'],
+          say: 'देखो भाई, Machine learning को एक line में समझो तो Model, Data और Training — यही तीन चीज़ें इसका दिल हैं।',
+          subtitle: 'What is Machine learning',
+          keyword: 'Machine learning',
+          layout: 'bigword',
+          transition: 'slide',
+          bullets: ['Model', 'Data', 'Training'],
+          note: 'Machine learning = Model, Data, Training working together.',
         },
         {
           id: 's2',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'RAG Explained',
-          keyword: 'RAG Explained',
-          bullets: ['first point', 'second point', 'third point'],
-        },
-        {
-          id: 's3',
-          type: 'steps',
-          say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
-          subtitle: 'Step by step',
-          keyword: 'How it works',
-          steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
-        },
-        {
-          id: 's4',
-          type: 'number',
-          say: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।',
-          subtitle: 'One number',
-          keyword: 'By the numbers',
-          value: '3',
-          unit: 'items',
-          caption: 'what the number means',
-        },
-        {
-          id: 's5',
-          type: 'compare',
-          say: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।',
-          subtitle: 'The difference',
-          keyword: 'Compare',
-          left: {label: 'WITHOUT', points: ['point one', 'point two']},
-          right: {label: 'WITH', points: ['point one', 'point two']},
+          say: 'Machine learning में यह हिस्सा सबसे ज़्यादा काम का है। Machine learning के कई रूप हैं — जैसे Supervised, Unsupervised और Reinforcement।',
+          subtitle: 'Types of Machine learning',
+          keyword: 'TYPES',
+          layout: 'cards',
+          transition: 'pop',
+          bullets: ['Supervised', 'Unsupervised', 'Reinforcement'],
+          note: 'Machine learning splits into 3 kinds — pick by the job, not by hype.',
         },
       ],
     },
@@ -109,36 +90,26 @@ export const CONTENT: VideoContent = {
       title: 'Part 2',
       scenes: [
         {
-          id: 's6',
+          id: 's3',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'RAG Explained',
-          keyword: 'RAG Explained',
-          bullets: ['first point', 'second point', 'third point'],
+          say: 'चलो, Machine learning को आसान भाषा में समझते हैं। ज़रूरी बात यह है कि Machine learning सिर्फ़ किताबी नहीं है। असली ज़िंदगी में इसे देखो तो बात तुरंत बैठ जाती है।',
+          subtitle: 'Where Machine learning is used',
+          keyword: 'IN PRACTICE',
+          layout: 'bullets',
+          transition: 'zoom',
+          bullets: ['Spam filters', 'Product recommendations', 'Fraud detection'],
+          note: 'Spam filters is the clearest example of Machine learning.',
         },
         {
-          id: 's7',
-          type: 'steps',
-          say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
-          subtitle: 'Step by step',
-          keyword: 'How it works',
-          steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
-        },
-        {
-          id: 's8',
+          id: 's4',
           type: 'concept',
-          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'RAG Explained',
-          keyword: 'RAG Explained',
-          bullets: ['first point', 'second point', 'third point'],
-        },
-        {
-          id: 's9',
-          type: 'steps',
-          say: 'अब step by step चलो। पहले डेटा इकट्ठा होता है, फिर उसे साफ़ किया जाता है, और आख़िर में model उससे सीखता है।',
-          subtitle: 'Step by step',
-          keyword: 'How it works',
-          steps: [{label: 'STEP ONE', note: 'what happens'}, {label: 'STEP TWO', note: 'what happens'}, {label: 'STEP THREE', note: 'what happens'}],
+          say: 'अब Machine learning की मुख्य बात समझो। सच यह भी है कि Machine learning हर जगह सही नहीं बैठता।',
+          subtitle: 'Limits of Machine learning',
+          keyword: 'LIMITS',
+          layout: 'two-col',
+          transition: 'wipe',
+          bullets: ['explicit if-else', 'breaks on new cases', 'human rewrites it'],
+          note: 'Where Machine learning breaks — knowing this saves real pain.',
         },
       ],
     },
@@ -146,39 +117,15 @@ export const CONTENT: VideoContent = {
       title: 'Part 3',
       scenes: [
         {
-          id: 's10',
-          type: 'number',
-          say: 'अब एक number देखो जो पूरी बात साफ़ कर देगा। नब्बे फ़ीसदी से ज़्यादा लोग यही गलती करते हैं, और वजह बहुत छोटी है।',
-          subtitle: 'One number',
-          keyword: 'By the numbers',
-          value: '3',
-          unit: 'items',
-          caption: 'what the number means',
-        },
-        {
-          id: 's11',
-          type: 'compare',
-          say: 'फ़र्क साफ़ है। एक तरफ़ पुराना तरीका है जो धीमा है, दूसरी तरफ़ नया तरीका जो तेज़ है — दोनों को साथ रखकर देखो।',
-          subtitle: 'The difference',
-          keyword: 'Compare',
-          left: {label: 'WITHOUT', points: ['point one', 'point two']},
-          right: {label: 'WITH', points: ['point one', 'point two']},
-        },
-        {
-          id: 's12',
-          type: 'concept',
-          say: 'अब मुख्य बात समझो। RAG Explained का मतलब है कि काम को छोटे-छोटे हिस्सों में बाँट देना, और हर हिस्से को एक-एक करके सॉल्व करना। एक आसान उदाहरण से बात पक्की हो जाती है।',
-          subtitle: 'RAG Explained',
-          keyword: 'RAG Explained',
-          bullets: ['first point', 'second point', 'third point'],
-        },
-        {
-          id: 's13',
+          id: 's5',
           type: 'recap',
-          say: 'बस इतना याद रखो। समस्या क्या थी, हल कैसे निकला, और आगे क्या करना है। तीन बातें, और काम ख़त्म। तीन बातें एक-एक line में दोहरा लो, तो सब पक्का हो जाता है।',
-          subtitle: 'Quick recap',
-          keyword: 'Remember',
-          bullets: ['first point', 'second point', 'third point'],
+          say: 'बस इतना याद रखो। Machine learning क्या है, यह कैसे काम करता है, और असली ज़िंदगी में कहाँ काम आता है —',
+          subtitle: 'Recap',
+          keyword: 'RECAP',
+          layout: 'takeaways',
+          transition: 'fade',
+          bullets: ['Definition', 'How it works', 'Where it is used'],
+          note: 'Three lines and Machine learning is yours.',
         },
       ],
     },

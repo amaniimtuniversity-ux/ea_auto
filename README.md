@@ -80,6 +80,36 @@ python3 scripts/new_topic.py --topic "photosynthesis" \
 ```
 Har `--say` ek scene banta hai. `--subtitle` aur `--keyword` usi order me.
 
+## Brief se script — ek line likho, baaki khud
+
+Web studio ke "Brief" box me apna plan likho. Engine usi se script banata hai —
+topic ka asli content, generic filler nahi.
+
+```
+machine learning: definition, types, uses, limitations
+```
+
+| Kya likho | Kya banega |
+|---|---|
+| `definition` | opening scene + **screen par definition pop-up card** |
+| `types` | domain ke asli types (Supervised / Unsupervised / Reinforcement) |
+| `steps` / `how it works` | 4–5 step timeline |
+| `uses` / `examples` | asli use-cases (Spam filters, Fraud detection…) |
+| `X vs Y` ya `compare` | left/right comparison, domain ke apne points |
+| `limitations` | kahan ye kaam nahi karta |
+| `benefits` / `why` | kyun matter karta hai |
+
+**Sirf definition chahiye?** Bas `photosynthesis: definition` likho — engine sirf
+2 scene banayega, 9 ka padding nahi. Jo likhoge wahi banega.
+
+Har scene ka apna `note` hota hai jo video me **pop-up card** ki tarah aata hai
+(upar-daayein, scene ke ~1.1s baad, phir chala jaata hai). Scene ke andar hi usko
+edit kar sakte ho.
+
+Layout randomly nahi aata — scene ke *matlab* se chunta hai (types → cards,
+steps → timeline, compare → versus) aur pichhle do scene ka layout dohraata nahi,
+isliye poora video ek jaisa nahi lagta.
+
 ## Web studio (browser se poora flow)
 
 Script ko terminal me edit karne ki zaroorat nahi — ek page par sab kuch:
