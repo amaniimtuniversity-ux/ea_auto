@@ -249,6 +249,12 @@ Built by **raghv**. Fonts are SIL OFL 1.1 (`public/fonts/OFL.txt`).
 The method was inspired by the broader "explainer video from code" idea; everything in this repo is written
 from scratch — see [LICENSE](LICENSE).
 
+### Sabse aasan: ek cell (Kaggle)
+
+`kathareel_onecell.py` ka poora content ek Kaggle cell me paste karke chalao —
+setup + studio + URL, sab andar. Koi `git pull`, koi missing file nahi.
+Regenerate: `python3 scripts/make_onecell.py`
+
 ### URL khulta nahi? Doctor chalao
 
 ```bash

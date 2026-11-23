@@ -15,7 +15,8 @@ import json
 import os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FILES = ['web/index.html', 'web/server.py', 'web/kaggle_launch.py', 'scripts/content_io.py']
+FILES = ['web/index.html', 'web/server.py', 'web/kaggle_launch.py', 'web/doctor.py',
+         'scripts/content_io.py']
 OUT = os.path.join(ROOT, 'kathareel_studio.ipynb')
 
 
@@ -80,6 +81,14 @@ def build():
              "print('ffmpeg:', shutil.which('ffmpeg') is not None,",
              "      '| node:', shutil.which('node') is not None)"),
 
+        md("### Agar `git pull` kaam na kare (repo me abhi push nahi hua)",
+           "",
+           "Cell 2 neeche wali files ko repo ke upar likh deta hai — studio, launcher aur doctor",
+           "sab isi notebook ke andar se aate hain. Isliye `web/doctor.py` missing jaisi error nahi aayegi.",
+           "",
+           "**Bas cell 1 → 2 → 3 chalao.** Repo clone sirf `src/` (Remotion scenes) ke liye chahiye,",
+           "aur wo pehle se GitHub par hai."),
+
         code(*(["# 2 · latest studio files (repo se naye ho sakte hain — ye override karte hain)",
                 "#    gzip+base64, isliye GitHub push ka intezaar nahi karna padta",
                 "import base64, gzip, os",
@@ -103,6 +112,9 @@ def build():
 
         code("# 3 · STUDIO START -> URL milega",
              "!python web/kaggle_launch.py"),
+
+        code("# 3b · URL khulta nahi? ye chalao — reason turant milega",
+             "!python web/doctor.py"),
 
         md("## Studio kaise use karna hai",
            "",
