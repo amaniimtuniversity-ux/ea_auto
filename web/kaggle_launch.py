@@ -2,17 +2,18 @@
 """
 kathareel studio — Kaggle / Colab launcher (by raghv)
 
-Kaggle notebook me bas itna chalao:
+Kaggle notebook me bas ek cell:
 
     !python web/kaggle_launch.py
 
 Ye khud:
   1. system packages (ffmpeg + Chromium libs) install karta hai
-  2. npm install karta hai
-  3. python packages (fastapi, uvicorn, edge-tts, gradio) install karta hai
-  4. public URL banata hai aur screen par print karta hai
+  2. npm install karta hai (Remotion + React)
+  3. python packages (fastapi, uvicorn, edge-tts) install karta hai
+  4. server ko background me start karta hai + public URL print karta hai
 
-Us URL ko kholo -> poora studio (script + voice + video) browser me.
+Us URL ko kholo -> poora studio browser me: script edit karo, video banao, video dekho.
+Cell return ho jata hai, server chalta rehta hai (notebook band karne tak).
 """
 import os
 import shutil
@@ -24,14 +25,14 @@ PORT = int(os.environ.get('KATHAREEL_PORT', '8000'))
 
 
 def sh(cmd, label, check=True):
-    print(f'\n\033[1;33m▸ {label}\033[0m')
+    print('\n\033[1;33m\u25b8 %s\033[0m' % label, flush=True)
     p = subprocess.run(cmd, shell=isinstance(cmd, str), cwd=ROOT,
                        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     out = (p.stdout or '').strip()
     if out:
-        print(out[-2500:])
+        print(out[-2500:], flush=True)
     if check and p.returncode != 0:
-        print(f'\n⚠ {label} fail hua (exit {p.returncode}) — aage badh raha hoon')
+        print('\n\u26a0 %s fail hua (exit %s) — aage badh raha hoon' % (label, p.returncode), flush=True)
     return p.returncode
 
 
@@ -39,43 +40,78 @@ def have(binary):
     return shutil.which(binary) is not None
 
 
-def main():
+def install_everything():
     print('=' * 72)
     print('  kathareel studio — setup')
-    print('=' * 72)
+    print('=' * 72, flush=True)
 
-    # 1. system packages
     if have('apt-get'):
         sh('apt-get -qq update', 'apt update', check=False)
         sh('apt-get -qq install -y ffmpeg libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 '
            'libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 '
            'libgbm1 libasound2 2>/dev/null', 'system packages (ffmpeg + chromium libs)', check=False)
+    elif not have('ffmpeg'):
+        print('\u26a0 ffmpeg nahi mila — voice generation fail hogi. Pehle ffmpeg install karo.', flush=True)
 
-    # 2. node deps
     if not os.path.isdir(os.path.join(ROOT, 'node_modules')):
         sh('npm install --silent', 'npm install (Remotion + React)')
 
-    # 3. python deps
     sh([sys.executable, '-m', 'pip', 'install', '-q', '--upgrade',
-        'fastapi', 'uvicorn', 'edge-tts', 'numpy', 'gradio'], 'python packages')
+        'fastapi', 'uvicorn', 'edge-tts', 'numpy'], 'python packages')
 
-    # 4. sanity
-    print()
-    print(f"  node   : {'✓' if have('node') else '✗'}")
-    print(f"  ffmpeg : {'✓' if have('ffmpeg') else '✗'}")
+    print(flush=True)
+    print('  node     : %s' % ('\u2713' if have('node') else '\u2717'), flush=True)
+    print('  ffmpeg   : %s' % ('\u2713' if have('ffmpeg') else '\u2717'), flush=True)
     try:
         import edge_tts  # noqa: F401
-        print('  edge-tts: ✓ (natural Hindi voice)')
+        print('  edge-tts : \u2713 (natural Hindi voice)', flush=True)
     except ImportError:
-        print('  edge-tts: ✗ (offline piper voice use hoga)')
+        print('  edge-tts : \u2717 (offline piper voice use hoga)', flush=True)
+
+
+def start_studio():
+    """Server ko background thread me chalao taaki notebook cell block na ho."""
+    import threading
+
+    os.makedirs(os.path.join(ROOT, 'out'), exist_ok=True)
+
+    def run():
+        sys.argv = ['server.py', '--port', str(PORT), '--public']
+        srv = os.path.join(ROOT, 'web', 'server.py')
+        code = open(srv, encoding='utf-8').read()
+        g = {'__name__': '__main__', '__file__': srv}
+        old = os.getcwd()
+        os.chdir(ROOT)
+        try:
+            exec(compile(code, srv, 'exec'), g)
+        finally:
+            os.chdir(old)
+
+    t = threading.Thread(target=run, daemon=True)
+    t.start()
+    return t
+
+
+def main():
+    install_everything()
 
     print('\n' + '=' * 72)
-    print('  studio start ho raha hai — neeche URL aayega (10–20 sec)')
-    print('=' * 72 + '\n')
+    print('  studio start ho raha hai — 15\u201330 sec me URL aayega')
+    print('=' * 72 + '\n', flush=True)
 
-    # 5. serve with a public tunnel
-    os.execv(sys.executable, [sys.executable, os.path.join(ROOT, 'web', 'server.py'),
-                              '--port', str(PORT), '--public'])
+    start_studio()
+
+    import time
+    time.sleep(28)
+
+    print('\n' + '=' * 72)
+    print('  AGAR upar PUBLIC https://....trycloudflare.com URL dikha:')
+    print('     -> wahi kholo, sabse aasan raasta')
+    print()
+    print('  YA Kaggle ka apna proxy URL (hamesha chalta hai):')
+    print('     https://www.kaggle.com/code/<YOUR-USER>/<YOUR-NOTEBOOK>/proxy/%d/' % PORT)
+    print('\n  (server background me chalu hai — notebook band karne tak zinda rahega)')
+    print('=' * 72, flush=True)
 
 
 if __name__ == '__main__':
