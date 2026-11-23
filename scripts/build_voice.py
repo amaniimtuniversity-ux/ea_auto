@@ -26,6 +26,7 @@ import asyncio
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import wave
@@ -141,9 +142,14 @@ async def edge_synth(text, voice, rate, out):
             'ya offline voice use karo:\n'
             '    pip install -q piper-tts && python3 scripts/build_voice.py --engine piper'
         )
-    for attempt in range(1, 5):
+    # edge ka endpoint kai baar negative rate (e.g. -5%) par khaali audio deta hai.
+    # Strategy: 2 try requested rate par, phir normal speed par — audio ko ffmpeg se
+    # slow kar dete hain. Sunne me same lagta hai aur pipeline piper par nahi girti.
+    plan = [rate, rate, '+0%', '+0%', '+0%']
+    last = None
+    for attempt, use_rate in enumerate(plan, start=1):
         try:
-            comm = edge_tts.Communicate(text, voice, rate=rate, boundary='WordBoundary')
+            comm = edge_tts.Communicate(text, voice, rate=use_rate, boundary='WordBoundary')
             got = 0
             with open(out, 'wb') as f:
                 async for chunk in comm.stream():
@@ -151,14 +157,17 @@ async def edge_synth(text, voice, rate, out):
                         f.write(chunk['data'])
                         got += len(chunk['data'])
             if got > 2000:
+                if use_rate != rate and rate not in (None, '', '+0%'):
+                    _slow_down(out, rate)
                 return out
-            raise RuntimeError('empty audio')
+            last = RuntimeError('empty audio')
         except Exception as e:  # endpoint sometimes returns nothing
-            if attempt == 4:
-                raise SystemExit(f'edge-tts failed 4x: {e}\n'
-                                 f'Try: --engine piper (offline)')
-            print(f'   retry {attempt}/4 ({type(e).__name__})')
-            await asyncio.sleep(1.2 * attempt)
+            last = e
+        if attempt < len(plan):
+            print(f'   retry {attempt}/{len(plan)} ({type(last).__name__})')
+            await asyncio.sleep(1.0 * attempt)
+    raise SystemExit(f'edge-tts failed {len(plan)}x: {last}\n'
+                     f'Try: --engine piper (offline)')
 
 
 PIPER_VOICES = {
@@ -166,6 +175,28 @@ PIPER_VOICES = {
     'hi_IN-priyamvada': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/hi/hi_IN/priyamvada/medium/hi_IN-priyamvada-medium',
     'hi_IN-rohan': 'https://huggingface.co/rhasspy/piper-voices/resolve/main/hi/hi_IN/rohan/medium/hi_IN-rohan-medium',
 }
+
+
+
+def _slow_pct(rate):
+    """'-5%' -> 0.95 ki speed factor."""
+    try:
+        return 1.0 + float(str(rate).replace('%', '').strip()) / 100.0
+    except ValueError:
+        return 1.0
+
+
+def _slow_down(path, rate):
+    """Normal-speed audio ko ffmpeg se slow karo (pitch same rehti hai)."""
+    factor = _slow_pct(rate)
+    if abs(factor - 1.0) < 0.01 or not shutil.which('ffmpeg'):
+        return path
+    tmp = path + '.slow.mp3'
+    r = subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', path,
+                        '-filter:a', f'atempo={factor:.3f}', tmp])
+    if r.returncode == 0 and os.path.exists(tmp):
+        os.replace(tmp, path)
+    return path
 
 
 def piper_model(name):

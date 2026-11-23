@@ -7,20 +7,27 @@ export type Beat = {
   say: string; subtitle: string; keyword: string;
 };
 
-export const TOTAL_FRAMES = 2531;
+export const TOTAL_FRAMES = 5603;
 export const FPS = 30;
 
 export const CHAPTERS: {n: number; title: string; from: number; to: number}[] = [
-  {n: 1, title: 'Problem', from: 106, to: 708},
-  {n: 2, title: 'Pipeline', from: 709, to: 1552},
-  {n: 3, title: 'Result', from: 1553, to: 2421},
+  {n: 1, title: 'Part 1', from: 106, to: 2082},
+  {n: 2, title: 'Part 2', from: 2083, to: 3836},
+  {n: 3, title: 'Part 3', from: 3837, to: 5493},
 ];
 
 export const BEATS: Beat[] = [
-  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 424, say: 'देखो भाई, एक language model अपनी याद से ही जवाब देता है। याद में ना हो, तो वो confident हो कर गलत भी बोल देता है।', subtitle: 'The model fills the gaps', keyword: 'Wrong answer'},
-  {id: 's2', chapter: 1, type: 'concept', from: 437, to: 682, say: 'इसी gap को RAG भरता है। जवाब देने से पहले, उसको तुम्हारे document दिखा दिए जाते हैं।', subtitle: 'Show the source first', keyword: 'RAG'},
-  {id: 's3', chapter: 2, type: 'steps', from: 709, to: 1153, say: 'अब pipeline देखो। पहले document छोटे chunks में टूटे जाते हैं। हर chunk का एक number बनता है। सवाल आने पर सबसे करीबी chunks उठाए जाते हैं।', subtitle: 'Chunk → Embed → Retrieve', keyword: 'Pipeline'},
-  {id: 's4', chapter: 2, type: 'number', from: 1166, to: 1526, say: 'Model को पूरा document नहीं दिया जाता, सिर्फ तीन सबसे करीबी chunks दिए जाते हैं। इससे जवाब सस्ता भी रहता है, और check करना आसान भी।', subtitle: 'Only the closest chunks', keyword: 'Top 3'},
-  {id: 's5', chapter: 3, type: 'compare', from: 1553, to: 2038, say: 'फर्क साफ है। बिना RAG, जवाब सिर्फ याद से आता है। RAG के साथ, जवाब के साथ उसका source भी आता है। इसलिए study और research में ये ज़रूरी हो जाता है।', subtitle: 'Answer + source', keyword: 'Clear difference'},
-  {id: 's6', chapter: 3, type: 'recap', from: 2051, to: 2395, say: 'बस इतना याद रखो। RAG का मतलब है, model को जवाब देने से पहले सही document दिखाओ। Chunk, embed, retrieve, फिर जवाब।', subtitle: 'Chunk, embed, retrieve', keyword: 'Remember'},
+  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 432, say: 'देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, aur ye topic usse kaise solve karta hai.', subtitle: 'The problem', keyword: 'Problem'},
+  {id: 's2', chapter: 1, type: 'concept', from: 445, to: 943, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
+  {id: 's3', chapter: 1, type: 'steps', from: 956, to: 1302, say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।', subtitle: 'Step by step', keyword: 'How it works'},
+  {id: 's4', chapter: 1, type: 'number', from: 1315, to: 1628, say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।', subtitle: 'One number', keyword: 'By the numbers'},
+  {id: 's5', chapter: 1, type: 'compare', from: 1641, to: 2056, say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।', subtitle: 'The difference', keyword: 'Compare'},
+  {id: 's6', chapter: 2, type: 'concept', from: 2083, to: 2581, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
+  {id: 's7', chapter: 2, type: 'steps', from: 2594, to: 2940, say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।', subtitle: 'Step by step', keyword: 'How it works'},
+  {id: 's8', chapter: 2, type: 'concept', from: 2953, to: 3451, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
+  {id: 's9', chapter: 2, type: 'steps', from: 3464, to: 3810, say: 'अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me samjhao. हर step में बोलो कि input क्या जाता है।', subtitle: 'Step by step', keyword: 'How it works'},
+  {id: 's10', chapter: 3, type: 'number', from: 3837, to: 4150, say: 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log. Number के बाद बोलो कि ये बड़ा है या छोटा।', subtitle: 'One number', keyword: 'By the numbers'},
+  {id: 's11', chapter: 3, type: 'compare', from: 4163, to: 4578, say: 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho. दोनों तरफ़ का एक फ़ायदा बोलो। और एक नुकसान भी साफ़ शब्दों में।', subtitle: 'The difference', keyword: 'Compare'},
+  {id: 's12', chapter: 3, type: 'concept', from: 4591, to: 5089, say: 'अब मुख्य बात। Yahan likho ki Machine Learning asal me hai kya — ek aasan example ke saath, bina jargon ke. यहाँ definition को अपने शब्दों में दोबारा बोलो। एक common गलतफहमी भी बताओ।', subtitle: 'Machine Learning', keyword: 'Machine Learning'},
+  {id: 's13', chapter: 3, type: 'recap', from: 5102, to: 5467, say: 'Bas itna yaad rakho. Teen baatein, aur kaam khatam. तीन बातें एक-एक line में दोहराओ। और एक छोटा homework दे दो viewer को।', subtitle: 'Quick recap', keyword: 'Remember'},
 ];

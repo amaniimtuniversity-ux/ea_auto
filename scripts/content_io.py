@@ -217,21 +217,65 @@ def save(data, path=CONTENT):
 # ---------------------------------------------------------------------------
 # skeleton generator: topic + minutes -> chapter/beat structure
 # ---------------------------------------------------------------------------
+def _pad_say(base, fillers, per_beat_s, max_words=34, wps=WORDS_PER_SEC):
+    """Hint ko target duration tak lamba karo — par ek beat ki word limit ke andar."""
+    need = min(max_words, max(6, round(per_beat_s * wps * 0.92)))
+    text = base
+    for f in fillers:
+        if len(text.split()) >= need:
+            break
+        if len((text + f).split()) <= max_words:
+            text += f
+    return text
+
+
 def skeleton(topic, minutes, title=None, tagline=None):
     slug = re.sub(r'[^a-z0-9-]+', '-', (topic or 'video').lower()).strip('-') or 'video'
     title = title or (topic or 'New Video')
     tagline = tagline or 'In Hindi, step by step'
 
-    beats = max(4, min(16, round(minutes * 60 / 14)))  # ~14s per beat
-    parts = max(2, min(5, round(minutes / 1.2)))
+    # target duration se beats nikalo. Har placeholder beat ~14s ka hota hai, par
+    # asli narration 22-34s ki honi chahiye — isliye beats kam rakhte hain aur
+    # har beat ka hint utna lamba likhte hain ki total target ke aas-paas aaye.
+    target_s = max(30.0, minutes * 60)
+    beats = max(4, min(40, round(target_s / 14.2)))     # ~14s per beat (34 words + pad)
+    parts = max(2, min(7, round(beats / 4)))
+
+    # har beat ka hint: Devanagari Hindi + English tech words (jaise asli script me).
+    # Lamba hissa tab jodte hain jab video lambi ho — taaki placeholder ka duration
+    # bhi target ke aas-paas rahe.
+    per_beat_s = target_s / max(1, beats)
+
+    # in fillers se hint ko target duration tak lamba karte hain — poori Devanagari,
+    # thoda thoda karke, taaki ek beat ki limit (~35 words) na toote.
+    FILL = {
+        'hook': [' यहाँ एक छोटा real example दो — जो viewer के रोज़ के काम से जुड़ा हो।',
+                 ' फिर बोलो कि इस video के बाद वो क्या कर पाएगा।'],
+        'concept': [' यहाँ definition को अपने शब्दों में दोबारा बोलो।',
+                    ' एक आसान example से समझाओ, बिना jargon के।',
+                    ' एक common गलतफहमी भी बताओ।'],
+        'steps': [' हर step में बोलो कि input क्या जाता है।',
+                  ' और output क्या आता है, एक line में।',
+                  ' आखिर में बताओ कौन सा step सबसे ज़रूरी है।'],
+        'number': [' Number के बाद बोलो कि ये बड़ा है या छोटा।',
+                   ' और ये number कहाँ से आया, ताकि भरोसा बने।'],
+        'compare': [' दोनों तरफ़ का एक फ़ायदा बोलो।',
+                    ' और एक नुकसान भी साफ़ शब्दों में।',
+                    ' आखिर में बताओ कब कौन सा option चुनना चाहिए।'],
+        'recap': [' तीन बातें एक-एक line में दोहराओ।',
+                  ' और एक छोटा homework दे दो viewer को।'],
+    }
 
     say_hints = {
-        'hook': 'देखो भाई, यहाँ एक आम situation है। यहाँ likho ki viewer ko kya problem पता है, और ये topic उसे क्यों solve करता है।',
-        'concept': 'अब मुख्य बात। यहाँ likho ki {t} असल में है क्या, एक आसान example के साथ।',
-        'steps': 'अब step by step देखो। पहले ये होता है, फिर ये, फिर ये।',
-        'number': 'यहाँ एक number बताओ जो बात साफ कर दे।',
-        'compare': 'फर्क साफ है। एक तरफ ये, दूसरी तरफ ये।',
-        'recap': 'बस इतना याद रखो। तीन बातें, और काम खत्म।',
+        'hook': ('देखो भाई, यहाँ एक आम situation है। Yahan likho ki viewer ko kya problem hoti hai, '
+                 'aur ye topic usse kaise solve karta hai.'),
+        'concept': ('अब मुख्य बात। Yahan likho ki {t} asal me hai kya — ek aasan example ke saath, '
+                    'bina jargon ke.'),
+        'steps': ('अब step by step चलो। Pehle ye hota hai, phir ye, phir ye — har step ek line me '
+                  'samjhao.'),
+        'number': 'Yahan ek number batao jo poori baat saaf kar de — kitna, kitne percent, kitne log.',
+        'compare': 'Farq saaf hai. Ek taraf ye hota hai, doosri taraf ye — dono ko saath rakho.',
+        'recap': 'Bas itna yaad rakho. Teen baatein, aur kaam khatam.',
     }
 
     # ONE teaching arc for the whole video, then split across parts:
@@ -250,7 +294,7 @@ def skeleton(topic, minutes, title=None, tagline=None):
             sc = {
                 'id': f's{made}',
                 'type': t,
-                'say': say_hints[t].format(t=title),
+                'say': _pad_say(say_hints[t].format(t=title), FILL[t], per_beat_s),
                 'subtitle': {'hook': 'The problem', 'concept': title, 'steps': 'Step by step',
                              'number': 'One number', 'compare': 'The difference',
                              'recap': 'Quick recap'}[t],

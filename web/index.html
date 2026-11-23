@@ -269,6 +269,25 @@ const $ = (id) => document.getElementById(id);
 const BASE = (location.pathname.match(/^(.*\/proxy\/\d+)/) || [''])[1]
           || location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
 const api = (p) => BASE + p;
+
+/* proxy/tunnel kabhi HTML error page laut deta hai — us case me "Unexpected
+   token '<'" jaisa confusing error aata tha. Ab saaf message milta hai. */
+async function jfetch(url, opts) {
+  const r = await fetch(url, opts);
+  const raw = await r.text();
+  const isJson = (r.headers.get('content-type') || '').includes('json');
+  if (!isJson) {
+    throw new Error(r.ok
+      ? 'Server ne JSON ke bajaye HTML bheja — proxy/tunnel issue lagta hai. Page refresh karke dobara try karo.'
+      : `HTTP ${r.status} — server se jawab nahi aaya (${r.statusText || 'error'}). Dobara try karo.`);
+  }
+  if (!r.ok) {
+    let msg = `HTTP ${r.status}`;
+    try { msg += ': ' + (JSON.parse(raw).detail || ''); } catch (_) {}
+    throw new Error(msg);
+  }
+  return JSON.parse(raw);
+}
 const TYPES = ['hook','concept','steps','compare','number','recap'];
 let CONTENT = {slug:'video', title:'', tagline:'', chapters:[]};
 let TARGET_MIN = 3;
@@ -458,14 +477,13 @@ $('btnGenerate').onclick = async () => {
   TARGET_MIN = +$('minutes').value || 3;
   const btn = $('btnGenerate'); btn.disabled = true; btn.textContent = 'Generating…';
   try {
-    const r = await fetch(api('/api/generate-script'), {
+    CONTENT = await jfetch(api('/api/generate-script'), {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify({topic, minutes: TARGET_MIN, title: $('newTitle').value.trim() || null})
     });
-    CONTENT = await r.json();
     renderScript();
     toast('Script bani — ab har line edit kar sakte ho', 'ok');
-  } catch(err) { toast('Generate fail: '+err, 'bad'); }
+  } catch(err) { toast('Generate fail: ' + err.message, 'bad'); }
   btn.disabled = false; btn.textContent = 'Generate script';
 };
 
@@ -474,10 +492,10 @@ $('btnSave').onclick = async () => {
   CONTENT.tagline = $('vTagline').value;
   const btn = $('btnSave'); btn.disabled = true; btn.textContent = 'Saving…';
   try {
-    await fetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
+    await jfetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(CONTENT)});
     toast('Script save ho gayi', 'ok');
-  } catch(err) { toast('Save fail: '+err, 'bad'); }
+  } catch(err) { toast('Save fail: ' + err.message, 'bad'); }
   btn.disabled = false; btn.textContent = 'Save script';
 };
 
@@ -503,18 +521,27 @@ function setStep(label) {
 $('btnBuild').onclick = async () => {
   CONTENT.title = $('vTitle').value;
   CONTENT.tagline = $('vTagline').value;
-  await fetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify(CONTENT)});
+  try {
+    await jfetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(CONTENT)});
+  } catch (err) { toast('Save fail: ' + err.message, 'bad'); return; }
 
-  $('btnBuild').disabled = true;
   $('progressWrap').style.display = 'block';
+  $('btnBuild').disabled = true;
   $('log').textContent = '';
-  const r = await fetch(api('/api/build'), {method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({engine:'edge', voice:$('voice').value, rate:$('rate').value})});
-  if (r.status === 409) { toast('Build already chal raha hai', 'bad'); $('btnBuild').disabled=false; return; }
+  try {
+    await jfetch(api('/api/build'), {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({engine:'edge', voice:$('voice').value, rate:$('rate').value})});
+  } catch (err) {
+    toast('Build start nahi hua: ' + err.message, 'bad');
+    $('btnBuild').disabled = false;
+    return;
+  }
   const t0 = Date.now();
   pollTimer = setInterval(async () => {
-    const s = await (await fetch(api('/api/status'))).json();
+    let s;
+    try { s = await jfetch(api('/api/status')); }
+    catch (err) { $('stepName').textContent = 'connection issue…'; return; }
     $('elapsed').textContent = Math.round((Date.now()-t0)/1000) + 's';
     setStep(s.step);
     $('log').textContent = s.lines.join('\n');
@@ -544,16 +571,25 @@ function loadVideo(mtime) {
 
 (async function init() {
   try {
-    const h = await (await fetch(api('/api/health'))).json();
+    const h = await jfetch(api('/api/health'));
     $('envpill').textContent = `node ${h.node?'✓':'✗'} · ffmpeg ${h.ffmpeg?'✓':'✗'}`;
     $('envpill').className = 'pill ' + (h.node && h.ffmpeg ? 'ok':'bad');
+    if (!h.ffmpeg || !h.node) {
+      const gone = [!h.ffmpeg && 'ffmpeg', !h.node && 'node'].filter(Boolean).join(' + ');
+      const box = document.createElement('div');
+      box.style.cssText = 'background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.4);'
+        + 'border-radius:10px;padding:11px 14px;margin-bottom:16px;font-size:13px;line-height:1.6;color:#fca5a5';
+      box.innerHTML = `<b>${gone} missing hai</b> — video build fail hogi. `
+        + `Setup dobara chalao: <code style="color:#ffb38a">python3 web/kaggle_launch.py</code>`;
+      document.querySelector('.card-b').prepend(box);
+    }
   } catch { $('envpill').textContent='offline'; $('envpill').className='pill bad'; }
 
-  const c = await (await fetch(api('/api/content'))).json();
+  const c = await jfetch(api('/api/content'));
   CONTENT = c; renderScript();
   if (c.estimate) TARGET_MIN = Math.max(0.5, Math.round(c.estimate/60));
 
-  const s = await (await fetch(api('/api/status'))).json();
+  const s = await jfetch(api('/api/status'));
   if (s.has_video) loadVideo(s.video_mtime);
 })();
 </script>

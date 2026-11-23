@@ -97,7 +97,9 @@ def build_pipeline(engine='edge', voice=None, rate='-5%'):
         run_cmd([py, 'scripts/check_content.py'], ROOT, label='check_content.py')
 
         JOB.step = 'hindi voiceover'
-        voice_cmd = [py, 'scripts/build_voice.py', '--engine', engine, '--rate', rate]
+        # '--rate' '-5%' alag arguments ki tarah jaate hain aur argparse unhe flag
+        # samajh leta hai -> '--rate=-5%' form zaroori hai.
+        voice_cmd = [py, 'scripts/build_voice.py', '--engine', engine, f'--rate={rate}']
         if voice:
             voice_cmd += ['--voice', voice]
         try:
@@ -216,7 +218,9 @@ def status():
         'lines': JOB.lines[-120:],
         'has_video': os.path.exists(VIDEO),
         'video_mtime': os.path.getmtime(VIDEO) if os.path.exists(VIDEO) else 0,
-        'video_size': os.path.getsize(VIDEO) if os.path.exists(VIDEO) else 0,
+        # build ke dauraan purana mp4 pada rehta hai — size 0 dikhao taaki "purani
+        # video ready hai" jaisa confusion na ho
+        'video_size': 0 if JOB.running else (os.path.getsize(VIDEO) if os.path.exists(VIDEO) else 0),
         'audio_size': _wav_size(),
     }
 
