@@ -1,0 +1,8 @@
+# CHAPTER 1 Why RAG
+Pehle problem samajh lo|ek language model|apni yaad se hi jawab deta hai
+Uske paas tumhare documents nahi hote|na hi koi source
+
+Isi gap ko RAG bharta hai|jawab dene se pehle|sahi document dikha diya jaata hai
+# CHAPTER 2 How It Works
+Ab pipeline dekho|documents chhote chunks me toote jaate hain|har chunk ka ek number banta hai
+Sawaal aaya to pehle usko|usi number space me convert karte hain

@@ -30,6 +30,8 @@ TTS 引擎（`TTS_ENGINE`，默认 `auto` = 按解说词语言选；**跑之前�
               一个 .onnx 语音，路径经 PIPER_MODEL 传入；无词边界，同 kokoro 逐块合成。装得最快，音色一般。
   kokoro_onnx Linux/ARM 本地配音，音色自然。onnxruntime 版 kokoro，无 torch/spacy（比 `kokoro` 引擎好装）。
               `pip install kokoro-onnx` + 模型 KOKORO_ONNX_MODEL / 声音库 KOKORO_ONNX_VOICES；KOKORO_ONNX_VOICE 默认 am_michael。
+  espeak     全离线兜底（apt install espeak-ng；印地语音色 hi 可读罗马字母 Hinglish）。音色机械，用来在
+              云端 TTS 被挡的环境（Kaggle / Colab / CI）里验证整条流水线；成片请换 edge / kokoro 或交成品 wav。
   读音覆写表 PRONOUNCE（见下）只作用于 `kokoro` 引擎（misaki 的 [词](/音标/) 语法）；piper / kokoro_onnx 不认这个语法，
   缩写读错时改写解说词或换引擎。
   用户有别的 TTS 偏好时不走本脚本：让他给成品配音 wav，按逐句/逐块时间轴手填 timeline.ts 与 subs.ts。
@@ -93,8 +95,8 @@ TAIL = int(os.environ.get('TAIL', 90))        # 片尾静音帧
 SHORT_TAIL = 45                               # 段末句的末块短于此帧数就要补停留（22 帧入场 + 8 帧离场后停不满 30 帧）；段内句不判
 CACHE = f'{ROOT}/audio/cache'
 os.makedirs(CACHE, exist_ok=True)
-if ENGINE not in ('auto', 'edge', 'kokoro', 'piper', 'kokoro_onnx'):
-    raise SystemExit(f'未知 TTS_ENGINE={ENGINE}（可选 auto / edge / kokoro / piper / kokoro_onnx）')
+if ENGINE not in ('auto', 'edge', 'kokoro', 'piper', 'kokoro_onnx', 'espeak'):
+    raise SystemExit(f'未知 TTS_ENGINE={ENGINE}（可选 auto / edge / kokoro / piper / kokoro_onnx / espeak）')
 
 
 def parse(path):
@@ -330,6 +332,29 @@ def synth_kokoro_onnx(text):
     return au
 
 
+_espeak_ok = None
+
+
+def synth_espeak(text):
+    """espeak-ng：完全离线的兜底引擎（无词边界 → 逐块合成），印地语音色可读罗马字母解说词。
+    用于云端 edge-tts 被挡的环境（Kaggle / Colab / CI）：`apt install espeak-ng`（macOS `brew install espeak-ng`）。
+    音色明显机械，适合验证流程，不适合成片；成片请换 edge / kokoro，或交成品 audio.wav。
+    环境变量：ESPEAK_VOICE=hi（Hinglish/印地语，默认按 CFG_LANG 取：hi→hi、zh→cmn、en→en）、ESPEAK_SPEED=150（词/分）。"""
+    global _espeak_ok
+    voice = os.environ.get('ESPEAK_VOICE') or {'hi': 'hi', 'zh': 'cmn', 'en': 'en'}[CFG_LANG]
+    speed = os.environ.get('ESPEAK_SPEED', '150')
+    au = cache_path(f'{voice}|{speed}|{text}', '.wav')
+    if os.path.exists(au):
+        return au
+    if _espeak_ok is None:
+        _espeak_ok = subprocess.run(['espeak-ng', '--version'], capture_output=True).returncode == 0
+        if not _espeak_ok:
+            raise SystemExit('TTS_ENGINE=espeak 需要 espeak-ng：Linux `apt install espeak-ng` / macOS `brew install espeak-ng`'
+                             '（离线兜底引擎，音色机械，适合验证流程不适合成片）')
+    subprocess.run(['espeak-ng', '-v', voice, '-s', str(speed), '-w', au, text], check=True, capture_output=True)
+    return au
+
+
 def decode(mp3):
     out = subprocess.run(['ffmpeg', '-v', 'error', '-i', mp3, '-f', 'f32le', '-ac', '1', '-ar', str(SR), '-'], capture_output=True, check=True).stdout
     return np.frombuffer(out, dtype=np.float32).copy()
@@ -391,7 +416,7 @@ async def synth_sentence(chunks, sep=''):
         x, lead_cut = trim_edges(decode(au))
         dur = len(x) / SR
         return x, chunk_starts(text, chunks, words, lead_cut, dur, sep), dur
-    chunk_synth = {'piper': synth_piper, 'kokoro_onnx': synth_kokoro_onnx}.get(ENGINE, synth_kokoro)
+    chunk_synth = {'piper': synth_piper, 'kokoro_onnx': synth_kokoro_onnx, 'espeak': synth_espeak}.get(ENGINE, synth_kokoro)
     pad = np.zeros(int(CHUNK_PAD * SR), dtype=np.float32)
     parts = []; starts = []; pos = 0.0
     for i, c in enumerate(chunks):
@@ -485,7 +510,8 @@ async def main(narr):
             print(f"    f{sb['from']} (≈{w:.0f}px{'，会折两行' if w > SUB_MAX_W * 1.3 else ''}) {sb['text']}")
     # 输出
     tl = {'fps': FPS, 'total_frames': total, 'engine': ENGINE,
-          'voice': {'edge': VOICE, 'piper': PIPER_VOICE_NAME, 'kokoro_onnx': KOKORO_ONNX_VOICE}.get(ENGINE, KOKORO_VOICE),
+          'voice': {'edge': VOICE, 'piper': PIPER_VOICE_NAME, 'kokoro_onnx': KOKORO_ONNX_VOICE,
+                    'espeak': f"espeak:{os.environ.get('ESPEAK_VOICE') or {'hi': 'hi', 'zh': 'cmn', 'en': 'en'}[CFG_LANG]}"}.get(ENGINE, KOKORO_VOICE),
           'rate': RATE if ENGINE == 'edge' else KOKORO_SPEED,
           'gap': GAP, 'para_gap': PARA_GAP, 'chapter_gap': CHAPTER_GAP, 'lead': LEAD, 'tail': TAIL,
           'lang': board_lang, 'voice_lang': CFG_LANG, 'chapters': chapters, 'sentences': sentences, 'chars': total_chars, 'words': total_words,

@@ -204,3 +204,28 @@ Built by **raghv**. The engine layer is derived from the open-source
 [anything2explainer](https://github.com/Vincentwei1021/anything2explainer) project by Vincent Wei
 (PolyForm Noncommercial 1.0.0); this fork keeps that licence, changes the default to Hinglish
 voiceover with an English-only board, and renames the skill to `kathareel`.
+
+## Demo (Kaggle / Colab)
+
+`kaggle/` folder me ek ready-made 37-second demo hai — Hinglish voiceover, English board, poora pipeline ek command me:
+
+```bash
+git clone https://github.com/amaniimtuniversity-ux/ea_auto.git
+cd ea_auto
+python3 kaggle/setup_demo.py --work ~/demo     # setup + TTS + render -> ~/demo/demo.mp4
+```
+
+Kaggle par `kaggle/kathareel_demo.ipynb` import karke **Run All** (Internet on). Kaggle se edge-tts block hai,
+isliye demo **espeak-ng** offline Hindi voice par gir jaata hai — pipeline ka proof, delivery quality nahi.
+Details: [`kaggle/README.md`](kaggle/README.md).
+
+Hinglish voice ke liye `src/config.ts` me `lang: 'hi'`:
+
+| `lang` | Voiceover | Board (on-screen text) |
+|---|---|---|
+| `'hi'` | Hinglish — edge-tts `hi-IN-MadhurNeural` | **English only** |
+| `'en'` | English — kokoro `am_liam` / edge `en-US-AndrewNeural` | **English only** |
+| `'zh'` | Chinese — edge-tts `zh-CN-YunxiNeural` | English only (this fork's rule) |
+
+Voice engine: `TTS_ENGINE=auto` (default) → `edge` for Hinglish/Chinese, `kokoro` for English.
+No internet? `TTS_ENGINE=espeak` (offline, robotic) — `apt install espeak-ng`.
