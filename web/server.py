@@ -180,11 +180,23 @@ def save_content(payload: ContentPayload):
     if scenes == 0:
         raise HTTPException(400, 'Content khali hai (0 scenes) — save rok diya, '
                                  'purani script safe hai')
-    missing = [c.get('title', '?') for c in data['chapters']
-               for sc in c.get('scenes', []) if not (sc.get('say') or '').strip()]
-    if missing:
-        raise HTTPException(400, f'{len(missing)} scene me narration khali hai — '
-                                 f'pehle Hindi narration likho')
+    # check_content.py wali validation — build fail hone se pehle hi pakad lo
+    import re as _re
+    dev = _re.compile(r'[\u0900-\u097F]')
+    problems = []
+    for ch in data['chapters']:
+        for sc in ch.get('scenes', []):
+            where = sc.get('id') or '?'
+            say = (sc.get('say') or '').strip()
+            if not say:
+                problems.append(f'{where}: narration khali hai')
+            elif not dev.search(say):
+                problems.append(f'{where}: narration Devanagari me likho')
+            if not (sc.get('subtitle') or '').strip():
+                problems.append(f'{where}: subtitle khali hai')
+    if problems:
+        raise HTTPException(400, 'Script me problem: ' + '; '.join(problems[:3])
+                            + (f' (+{len(problems)-3} more)' if len(problems) > 3 else ''))
     for ch in data['chapters']:
         for sc in ch.get('scenes', []):
             sc.setdefault('bullets', [])

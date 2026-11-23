@@ -140,6 +140,7 @@
   <div class="hwrap">
     <div class="logo"><div class="dot">▶</div> kathareel <span class="tag">studio</span></div>
     <div class="spacer"></div>
+    <button class="pill" id="fixpill" style="display:none;cursor:pointer">🔧 fix N scenes</button>
     <span class="pill" id="envpill">checking…</span>
     <a class="pill" id="linkpill" style="display:none" target="_blank" rel="noopener">🔗 current link</a>
     <span class="pill" id="voicepill">voice: edge · Madhur</span>
@@ -400,6 +401,9 @@ function sceneHTML(sc, ci, si) {
       <span class="chapter chapnum">${sc.id}</span>
       <select class="scene-type-sel" data-c="${ci}" data-s="${si}" style="width:auto;padding:3px 8px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;background:rgba(59,201,245,.08);color:var(--cool);border-color:var(--edge2)">${typeOpts}</select>
       <span class="scene-time">~${Math.round(secs)}s</span>
+      ${(!(sc.say||'').trim() || !/[\u0900-\u097F]/.test(sc.say||'')) ?
+        '<span style="font-size:11px;color:#f87171;font-weight:700">● narration</span>' :
+        (!(sc.subtitle||'').trim() ? '<span style="font-size:11px;color:#fbbf24;font-weight:700">● subtitle</span>' : '')}
       <button class="sm danger" data-del data-c="${ci}" data-s="${si}">✕</button>
     </div>
 
@@ -437,6 +441,72 @@ function sceneHTML(sc, ci, si) {
   </div>`;
 }
 
+/* Naya scene hamesha valid ho: narration Devanagari, subtitle English.
+   Khali scene banane par check_content fail hota hai — isliye sample text. */
+function blankScene(id) {
+  return {
+    id: id, type: 'concept',
+    say: 'यहाँ अपनी बात लिखो — पहले problem, फिर solution, आसान example के साथ।',
+    subtitle: 'Type your point here',
+    keyword: 'New point',
+    bullets: ['point one', 'point two'],
+    steps: [], left: null, right: null, value: '', unit: '', caption: ''
+  };
+}
+
+/* Save/Build se pehle wahi validation jo scripts/check_content.py karta hai */
+function validateContent() {
+  const problems = [];
+  const dev = /[\u0900-\u097F]/;
+  let scenes = 0;
+  CONTENT.chapters.forEach((ch, ci) => {
+    ch.scenes.forEach((sc, si) => {
+      scenes++;
+      const where = sc.id || `part${ci+1}-scene${si+1}`;
+      if (!(sc.say || '').trim()) problems.push(`${where}: narration khali hai`);
+      else if (!dev.test(sc.say)) problems.push(`${where}: narration Devanagari me likho`);
+      if (!(sc.subtitle || '').trim()) problems.push(`${where}: subtitle khali hai`);
+      if ((sc.subtitle || '').length > 48) problems.push(`${where}: subtitle 48 chars se lamba`);
+      if ((sc.keyword || '').length > 24) problems.push(`${where}: keyword 24 chars se lamba`);
+      if ((sc.say || '').split(/\s+/).filter(Boolean).length > 35)
+        problems.push(`${where}: narration 35 words se lamba`);
+    });
+  });
+  if (CONTENT.chapters.length < 2) problems.push('kam se kam 2 parts chahiye (progress bar ke liye)');
+  if (scenes === 0) problems.push('koi scene nahi');
+  return problems;
+}
+
+/* Khali narration/subtitle wali scenes ko ek click me theek karo */
+function refreshProblems() {
+  const problems = validateContent();
+  const el = $('fixpill');
+  if (!el) return;
+  if (!problems.length) { el.style.display = 'none'; return; }
+  el.style.display = 'inline-block';
+  el.textContent = `🔧 fix ${problems.length} issue${problems.length > 1 ? 's' : ''}`;
+}
+
+function fixProblems() {
+  let fixed = 0;
+  CONTENT.chapters.forEach(ch => ch.scenes.forEach(sc => {
+    const bad = !(sc.say || '').trim() || !/[\u0900-\u097F]/.test(sc.say || '');
+    if (bad) {
+      sc.say = 'यहाँ अपनी बात लिखो — पहले problem, फिर solution, आसान example के साथ।';
+      fixed++;
+    }
+    if (!(sc.subtitle || '').trim()) { sc.subtitle = 'Type your point here'; fixed++; }
+    if (!(sc.keyword || '').trim()) sc.keyword = 'Point';
+  }));
+  while (CONTENT.chapters.length < 2) {
+    const n = CONTENT.chapters.reduce((a,c)=>a+c.scenes.length,0)+1;
+    CONTENT.chapters.push({title:'Part '+(CONTENT.chapters.length+1), scenes:[blankScene('s'+n)]});
+    fixed++;
+  }
+  renderScript();
+  toast(fixed ? fixed + ' cheezein theek kar di — ab text apne hisaab se badlo' : 'Sab theek hai', 'ok');
+}
+
 function renderScript() {
   const box = $('scriptList');
   if (!CONTENT.chapters.length) {
@@ -455,6 +525,7 @@ function renderScript() {
     </div>`).join('');
   $('vTitle').value = CONTENT.title || '';
   $('vTagline').value = CONTENT.tagline || '';
+  refreshProblems();
   renderEstimate();
 }
 
@@ -503,20 +574,14 @@ document.addEventListener('click', (e) => {
   if (t.dataset.addscene !== undefined) {
     const ci = +t.dataset.addscene;
     const n = CONTENT.chapters.reduce((a,c)=>a+c.scenes.length,0)+1;
-    CONTENT.chapters[ci].scenes.push({
-      id:'s'+n, type:'concept', say:'', subtitle:'', keyword:'',
-      bullets:[], steps:[], left:null, right:null, value:'', unit:'', caption:''
-    });
+    CONTENT.chapters[ci].scenes.push(blankScene('s'+n));
     renderScript();
   }
 });
 
 $('btnAddChapter').onclick = () => {
   const n = CONTENT.chapters.reduce((a,c)=>a+c.scenes.length,0)+1;
-  CONTENT.chapters.push({title:'Part '+(CONTENT.chapters.length+1), scenes:[{
-    id:'s'+n, type:'concept', say:'', subtitle:'', keyword:'',
-    bullets:[], steps:[], left:null, right:null, value:'', unit:'', caption:''
-  }]});
+  CONTENT.chapters.push({title:'Part '+(CONTENT.chapters.length+1), scenes:[blankScene('s'+n)]});
   renderScript();
 };
 
@@ -544,6 +609,12 @@ $('btnGenerate').onclick = async () => {
 $('btnSave').onclick = async () => {
   CONTENT.title = $('vTitle').value;
   CONTENT.tagline = $('vTagline').value;
+  const problems = validateContent();
+  if (problems.length) {
+    toast(problems.length + ' problem: ' + problems[0] + ' — list console me', 'bad');
+    console.warn('kathareel validation:', problems);
+    return;
+  }
   const btn = $('btnSave'); btn.disabled = true; btn.textContent = 'Saving…';
   try {
     await jfetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
@@ -558,6 +629,7 @@ $('btnSave').onclick = async () => {
 };
 
 $('btnEstimate').onclick = renderEstimate;
+$('fixpill').onclick = fixProblems;
 
 /* ---------------- build ---------------- */
 let pollTimer = null;
@@ -579,6 +651,15 @@ function setStep(label) {
 $('btnBuild').onclick = async () => {
   CONTENT.title = $('vTitle').value;
   CONTENT.tagline = $('vTagline').value;
+  const problems = validateContent();
+  if (problems.length) {
+    toast('Pehle ye theek karo: ' + problems[0] + ' (+' + (problems.length-1) + ' more)', 'bad');
+    console.warn('kathareel validation:', problems);
+    const firstId = problems[0].split(':')[0];
+    const el = document.querySelector(`.scene [data-f="say"]`);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
   try {
     await jfetch(api('/api/content'), {method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(CONTENT)});
