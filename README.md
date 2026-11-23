@@ -249,6 +249,16 @@ Built by **raghv**. Fonts are SIL OFL 1.1 (`public/fonts/OFL.txt`).
 The method was inspired by the broader "explainer video from code" idea; everything in this repo is written
 from scratch — see [LICENSE](LICENSE).
 
+### URL khulta nahi? Doctor chalao
+
+```bash
+python3 web/doctor.py
+```
+
+Ye batata hai: code purana hai ya nahi (version), server chal raha hai ya nahi,
+duplicate/zombie process, ffmpeg/node, tunnel zinda hai ya nahi, aur public URL
+asal me jawab de raha hai ya nahi (1033 = tunnel dead, 530 = server se connect nahi).
+
 ### Link kaun sa use karna hai
 
 | Link | Kab tak chalta hai |

@@ -38,6 +38,8 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse  # noqa: 
 from pydantic import BaseModel  # noqa: E402
 import uvicorn  # noqa: E402
 
+VERSION = '1.2'
+
 app = FastAPI(title='kathareel studio')
 
 OUT = os.path.join(ROOT, 'out')
@@ -264,7 +266,7 @@ def font(name: str):
 def health():
     return {'ok': True, 'root': ROOT, 'node': shutil.which('node') is not None,
             'ffmpeg': shutil.which('ffmpeg') is not None,
-            'tunnel_url': TUNNEL.url}
+            'tunnel_url': TUNNEL.url, 'version': VERSION}
 
 
 def _port_open(port, host='127.0.0.1', timeout=0.4):
@@ -481,7 +483,7 @@ def main():
         banner.append('  (tunnel girne par naya URL khud ban jata hai — /api/health me dekho)')
 
     print('\n' + '=' * 74)
-    print('  kathareel studio — ready')
+    print(f'  kathareel studio — ready  (v{VERSION})')
     for line in banner:
         print(line)
     print('=' * 74 + '\n')
