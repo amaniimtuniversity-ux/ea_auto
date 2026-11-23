@@ -286,9 +286,10 @@ class Tunnel:
       - /api/health me current URL aata hai
     """
 
-    def __init__(self, port, enabled=True):
+    def __init__(self, port, enabled=True, provider='auto'):
         self.port = port
         self.enabled = enabled
+        self.provider = provider          # 'auto' | 'cloudflared' | 'lhr'
         self.url = None
         self.proc = None
         self._stop = threading.Event()
@@ -308,12 +309,55 @@ class Tunnel:
                        capture_output=True)
         return '/tmp/cloudflared' if os.path.exists('/tmp/cloudflared') else None
 
+    # ---- provider: localhost.run (ssh, reliable) -----------------------
+    def _spawn_lhr(self):
+        log = '/tmp/lhr.log'
+        open(log, 'w').close()
+        self._log = log
+        self.proc = subprocess.Popen(
+            ['ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'UserKnownHostsFile=/dev/null',
+             '-o', 'ServerAliveInterval=20', '-o', 'ExitOnForwardFailure=yes',
+             '-R', f'80:localhost:{self.port}', 'nokey@localhost.run'],
+            stdout=open(log, 'w'), stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL)
+        pat = re.compile(r'https://([a-z0-9]+)\.app\.lhr\.life')
+        for _ in range(80):
+            if self._stop.is_set():
+                return False
+            time.sleep(0.5)
+            try:
+                found = pat.search(open(log, encoding='utf-8', errors='ignore').read())
+            except OSError:
+                found = None
+            if found:
+                self.url = found.group(0)
+                with open(URL_FILE, 'w') as f:
+                    f.write(self.url)
+                print(f'  PUBLIC  : {self.url}  (localhost.run)', flush=True)
+                return True
+            if self.proc.poll() is not None:
+                return False
+        return False
+
     def _spawn(self):
+        order = ([self.provider] if self.provider != 'auto'
+                 else ['cloudflared', 'lhr'])
+        for prov in order:
+            if prov == 'lhr':
+                if shutil.which('ssh') and self._spawn_lhr():
+                    return True
+            elif self._spawn_cloudflared():
+                return True
+            if self._stop.is_set():
+                return False
+        return False
+
+    def _spawn_cloudflared(self):
         exe = self._find_exe()
         if not exe:
             return False
         log = '/tmp/cloudflared.log'
         open(log, 'w').close()
+        self._log = log
         self.proc = subprocess.Popen(
             [exe, 'tunnel', '--url', f'http://127.0.0.1:{self.port}', '--no-autoupdate'],
             stdout=open(log, 'w'), stderr=subprocess.STDOUT)
@@ -343,18 +387,50 @@ class Tunnel:
             if ok:
                 backoff = 2
             else:
-                print('  tunnel start nahi hua — 15s me retry', flush=True)
-                time.sleep(15)
+                print('  tunnel start nahi hua — 8s me retry', flush=True)
+                time.sleep(8)
                 continue
-            # tunnel process ke marne tak wait
+            # process zinda hone se tunnel zinda nahi hota: Cloudflare kabhi
+            # "Unauthorized: Tunnel not found" deta hai (tunnel server side delete).
+            # Isliye URL ko bhi health-check karte hain.
             while not self._stop.is_set() and self.proc and self.proc.poll() is None:
-                time.sleep(2)
+                time.sleep(5)
+                if self._tunnel_dead():
+                    print('  tunnel dead ho gaya (Cloudflare ne drop kiya) — restart',
+                          flush=True)
+                    try:
+                        self.proc.terminate()
+                    except Exception:  # noqa: BLE001
+                        pass
+                    break
             if self._stop.is_set():
                 break
             print(f'  tunnel gir gaya — {backoff}s me naya URL', flush=True)
             self.url = None
             time.sleep(backoff)
             backoff = min(30, backoff * 2)
+
+    def _tunnel_dead(self):
+        """URL ab bhi kaam kar raha hai? Log me 'Tunnel not found' bhi dekh lo."""
+        try:
+            txt = open(getattr(self, '_log', '/tmp/cloudflared.log'),
+                       encoding='utf-8', errors='ignore').read()
+            for bad in ('Tunnel not found', 'Unauthorized', 'Permission denied',
+                        'remote port forwarding failed'):
+                if bad in txt:
+                    return True
+        except OSError:
+            pass
+        if not self.url:
+            return True
+        try:
+            import urllib.request
+            req = urllib.request.Request(self.url + '/api/health',
+                                         headers={'User-Agent': 'kathareel-watch'})
+            with urllib.request.urlopen(req, timeout=8) as r:
+                return r.status != 200
+        except Exception:  # noqa: BLE001
+            return True
 
     # --- public --------------------------------------------------------
     def start(self):
@@ -376,8 +452,15 @@ def main():
     ap.add_argument('--port', type=int, default=8000)
     ap.add_argument('--host', default='0.0.0.0')
     ap.add_argument('--public', action='store_true', help='public URL banao (Kaggle/Colab)')
-    ap.add_argument('--tunnel', default='cloudflared', choices=['cloudflared', 'none'])
+    ap.add_argument('--tunnel', default='auto', choices=['auto', 'cloudflared', 'lhr', 'none'])
     a = ap.parse_args()
+
+    # agar port pehle se busy hai to uvicorn chupchaap fail hota hai aur tunnel
+    # kisi doosre server ko point karne lagta hai — isliye pehle hi saaf error do
+    if _port_open(a.port):
+        print(f'\n  ❌ port {a.port} pehle se busy hai.')
+        print(f'     Purana server band karo, ya naya port do: --port {a.port + 1}\n')
+        sys.exit(1)
 
     server = threading.Thread(
         target=lambda: uvicorn.run(app, host=a.host, port=a.port, log_level='warning'),
@@ -389,9 +472,10 @@ def main():
         time.sleep(0.25)
 
     banner = [f'  local   : http://127.0.0.1:{a.port}']
-    if a.public and a.tunnel == 'cloudflared':
+    if a.public and a.tunnel != 'none':
         TUNNEL.port = a.port
         TUNNEL.enabled = True
+        TUNNEL.provider = a.tunnel
         TUNNEL.start()          # pehla URL print khud karega
         banner.append(f'  Kaggle  : https://www.kaggle.com/code/<your-notebook>/proxy/{a.port}/')
         banner.append('  (tunnel girne par naya URL khud ban jata hai — /api/health me dekho)')
