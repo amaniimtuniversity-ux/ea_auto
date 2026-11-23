@@ -20,26 +20,67 @@ topic  →  content.ts  →  Hindi voiceover  →  timeline  →  rendered MP4
 | Look | dark canvas, one accent colour per beat, big type, step-by-step walks, chapter progress bar |
 | Length | whatever your content needs (the demo is 84 s) |
 
-## Quick start
+## Topic kaise do? (3 tareeke)
+
+### 1. Sirf AI agent ko bolo (sabse aasan)
+```
+"Photosynthesis par ek 3-minute ka Hinglish explainer banao"
+```
+Agent `SKILL.md` padh kar khud `src/content.ts` likh dega (Hindi narration + English captions),
+voice banayega aur render karega. Tumhe code chhune ki zaroorat nahi.
+
+### 2. Skeleton banao, narration khud bharo
+```bash
+python3 scripts/new_topic.py --topic "Photosynthesis" --title "Photosynthesis"
+```
+Ye `src/content.ts` bana deta hai — 3 parts, 6 scenes, har scene me Hindi hint likha hota hai
+ki kya likhna hai. Bas `say` lines apne words se badal do, `subtitle`/`keyword` English hi rakho.
+
+### 3. Seedha narration script do (best control)
+```bash
+python3 scripts/new_topic.py --topic "photosynthesis" \
+  --say "देखो भाई, पौधा अपना खाना खुद बनाता है।" \
+  --say "इस process को photosynthesis कहते हैं।" \
+  --subtitle "Plants make their own food" \
+  --subtitle "The name of the process" \
+  --keyword "Photosynthesis" --keyword "Plants"
+```
+Har `--say` ek scene banta hai. `--subtitle` aur `--keyword` usi order me.
+
+## Quick start (manual)
 
 ```bash
 git clone https://github.com/amaniimtuniversity-ux/ea_auto.git
 cd ea_auto
 npm install
+pip install edge-tts numpy                 # Hindi voice ke liye
+sudo apt install ffmpeg                    # ya: brew install ffmpeg
 
-# 1. edit the content (one file)
-open src/content.ts        # Hindi lines + English captions
+# 1. content likho (upar ke 3 tareeke)
+# 2. check karo
+python3 scripts/check_content.py           # Devanagari, English board, length - sab check
 
-# 2. build the voiceover + timeline
-python3 scripts/build_voice.py            # needs: pip install edge-tts numpy, ffmpeg
+# 3. voice + timeline
+python3 scripts/build_voice.py
 
-# 3. render
-npx remotion render src/index.ts Explainer out/video.mp4
+# 4. render
+npx remotion render src/index.ts Explainer out/video.mp4 --concurrency=2
 ```
 
 Preview while editing: `npx remotion studio src/index.ts`
 
-## The one file you edit: `src/content.ts`
+## Tumhe kaunsi files chhune padenge?
+
+**Sirf ek: `src/content.ts`.** Baaki sab (`timeline.ts`, `voice/*.wav`) script khud banata hai.
+
+| File | Tum chhoona? |
+|---|---|
+| `src/content.ts` | ✅ haan — yahi tumhara topic hai |
+| `src/theme.ts` | optional — colours/fonts badalne ho to |
+| `src/timeline.ts` | ❌ kabhi nahi (auto-generated) |
+| `src/components/*` | optional — naya visual type chahiye to |
+
+## `src/content.ts` ka format
 
 ```ts
 {

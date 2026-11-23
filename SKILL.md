@@ -18,10 +18,14 @@ description: Turn any topic into a YouTube-style teaching video with a Hindi (Hi
 
 ## Workflow
 
+0. **Input**: user ek topic deta hai (ya article/document). Isi se tum `src/content.ts` likhte ho —
+   code me kuch aur chhune ki zaroorat nahi. Agar user khud narration de to usko waisa hi use karo.
+   Skeleton chahiye to: `python3 scripts/new_topic.py --topic "<slug>" --title "<Title>"`.
 1. **Ask** what topic, how long, and which voice (`hi-IN-MadhurNeural` male, `hi-IN-SwaraNeural` female,
    or offline piper). Default: Madhur, `-5%`.
 2. **Write `src/content.ts`** — chapters, then scenes. Follow the narration rules below.
-3. **Voiceover**: `python3 scripts/build_voice.py` → writes `public/voice/<slug>.wav` + `src/timeline.ts`.
+3. **Check**: `python3 scripts/check_content.py` — Devanagari narration, English board, length, duplicate ids.
+4. **Voiceover**: `python3 scripts/build_voice.py` → writes `public/voice/<slug>.wav` + `src/timeline.ts`.
 4. **Check timings**: `python3 scripts/build_voice.py --check` prints frame ranges per beat.
 5. **Render**: `npx remotion render src/index.ts Explainer out/video.mp4 --concurrency=2`.
 6. **Verify**: render 6–8 stills across the timeline and look at them. Check: nothing collides with the

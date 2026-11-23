@@ -7,20 +7,20 @@ export type Beat = {
   say: string; subtitle: string; keyword: string;
 };
 
-export const TOTAL_FRAMES = 2194;
+export const TOTAL_FRAMES = 2531;
 export const FPS = 30;
 
 export const CHAPTERS: {n: number; title: string; from: number; to: number}[] = [
-  {n: 1, title: 'Problem', from: 106, to: 639},
-  {n: 2, title: 'Pipeline', from: 640, to: 1381},
-  {n: 3, title: 'Result', from: 1382, to: 2084},
+  {n: 1, title: 'Problem', from: 106, to: 708},
+  {n: 2, title: 'Pipeline', from: 709, to: 1552},
+  {n: 3, title: 'Result', from: 1553, to: 2421},
 ];
 
 export const BEATS: Beat[] = [
-  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 389, say: 'Dekho bhai, ek language model apni yaad se hi jawab deta hai. Yaad me na ho, to wo confident ho kar galat bhi bol deta hai.', subtitle: 'The model answers from memory', keyword: 'Wrong answer'},
-  {id: 's2', chapter: 1, type: 'concept', from: 402, to: 613, say: 'Isi gap ko RAG bharta hai. Jawab dene se pehle, usko tumhare document dikha diye jaate hain.', subtitle: 'Show the source first', keyword: 'RAG'},
-  {id: 's3', chapter: 2, type: 'steps', from: 640, to: 1004, say: 'Ab pipeline dekho. Pehle document chhote chunks me toote jaate hain. Har chunk ka ek number banta hai. Sawaal aane par sabse kareebi chunks uthaye jaate hain.', subtitle: 'Chunk → Embed → Retrieve', keyword: 'Pipeline'},
-  {id: 's4', chapter: 2, type: 'number', from: 1017, to: 1355, say: 'Model ko poora document nahi diya jaata, sirf teen sabse kareebi chunks diye jaate hain. Isse jawab sasta bhi rehta hai, aur check karna aasan bhi.', subtitle: 'Only the closest chunks', keyword: 'Top 3'},
-  {id: 's5', chapter: 3, type: 'compare', from: 1382, to: 1755, say: 'Farq saaf hai. Bina RAG, jawab sirf yaad se aata hai. RAG ke saath, jawab ke saath uska source bhi aata hai. Isliye study aur research me ye zaroori ho jaata hai.', subtitle: 'Answer + source', keyword: 'Clear difference'},
-  {id: 's6', chapter: 3, type: 'recap', from: 1768, to: 2058, say: 'Bas itna yaad rakho. RAG ka matlab hai, model ko jawab dene se pehle sahi document dikhao. Chunk, embed, retrieve, phir jawab.', subtitle: 'Chunk, embed, retrieve', keyword: 'Remember'},
+  {id: 's1', chapter: 1, type: 'hook', from: 106, to: 424, say: 'देखो भाई, एक language model अपनी याद से ही जवाब देता है। याद में ना हो, तो वो confident हो कर गलत भी बोल देता है।', subtitle: 'The model answers from memory', keyword: 'Wrong answer'},
+  {id: 's2', chapter: 1, type: 'concept', from: 437, to: 682, say: 'इसी gap को RAG भरता है। जवाब देने से पहले, उसको तुम्हारे document दिखा दिए जाते हैं।', subtitle: 'Show the source first', keyword: 'RAG'},
+  {id: 's3', chapter: 2, type: 'steps', from: 709, to: 1153, say: 'अब pipeline देखो। पहले document छोटे chunks में टूटे जाते हैं। हर chunk का एक number बनता है। सवाल आने पर सबसे करीबी chunks उठाए जाते हैं।', subtitle: 'Chunk → Embed → Retrieve', keyword: 'Pipeline'},
+  {id: 's4', chapter: 2, type: 'number', from: 1166, to: 1526, say: 'Model को पूरा document नहीं दिया जाता, सिर्फ तीन सबसे करीबी chunks दिए जाते हैं। इससे जवाब सस्ता भी रहता है, और check करना आसान भी।', subtitle: 'Only the closest chunks', keyword: 'Top 3'},
+  {id: 's5', chapter: 3, type: 'compare', from: 1553, to: 2038, say: 'फर्क साफ है। बिना RAG, जवाब सिर्फ याद से आता है। RAG के साथ, जवाब के साथ उसका source भी आता है। इसलिए study और research में ये ज़रूरी हो जाता है।', subtitle: 'Answer + source', keyword: 'Clear difference'},
+  {id: 's6', chapter: 3, type: 'recap', from: 2051, to: 2395, say: 'बस इतना याद रखो। RAG का मतलब है, model को जवाब देने से पहले सही document दिखाओ। Chunk, embed, retrieve, फिर जवाब।', subtitle: 'Chunk, embed, retrieve', keyword: 'Remember'},
 ];
