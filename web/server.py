@@ -175,6 +175,16 @@ def get_content():
 @app.post('/api/content')
 def save_content(payload: ContentPayload):
     data = payload.model_dump()
+    # safety: khali ya adhoora content purani script ko mita na de
+    scenes = sum(len(c.get('scenes', [])) for c in data.get('chapters', []))
+    if scenes == 0:
+        raise HTTPException(400, 'Content khali hai (0 scenes) — save rok diya, '
+                                 'purani script safe hai')
+    missing = [c.get('title', '?') for c in data['chapters']
+               for sc in c.get('scenes', []) if not (sc.get('say') or '').strip()]
+    if missing:
+        raise HTTPException(400, f'{len(missing)} scene me narration khali hai — '
+                                 f'pehle Hindi narration likho')
     for ch in data['chapters']:
         for sc in ch.get('scenes', []):
             sc.setdefault('bullets', [])

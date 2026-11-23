@@ -287,6 +287,12 @@ async function jfetch(url, opts) {
     try { msg += ': ' + (JSON.parse(raw).detail || ''); } catch (_) {}
     throw new Error(msg);
   }
+  const body = JSON.parse(raw);
+  const expects = (opts && opts.body) ? opts.body.length : 0;
+  if (expects > 40 && raw.length < 40 && /content/.test(url)) {
+    throw new Error('Server ne khali jawab diya — try again');
+  }
+  return body;
   return JSON.parse(raw);
 }
 const TYPES = ['hook','concept','steps','compare','number','recap'];
