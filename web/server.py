@@ -110,6 +110,11 @@ def build_pipeline(engine='edge', voice=None, rate='-5%'):
             else:
                 raise
 
+        # node_modules gayab hai to render turant fail hoga - pehle install
+        if not os.path.isdir(os.path.join(ROOT, 'node_modules')):
+            JOB.step = 'npm install'
+            run_cmd(['npm', 'install', '--silent'], ROOT, label='npm install')
+
         JOB.step = 'rendering'
         cores = os.cpu_count() or 2
         cores = min(max(1, cores), 4)
